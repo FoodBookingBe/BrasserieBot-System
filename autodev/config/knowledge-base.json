@@ -1,0 +1,101 @@
+{
+  "knowledgeBase": {
+    "enabled": true,
+    "pinecone": {
+      "apiKey": "${PINECONE_API_KEY}",
+      "environment": "gcp-starter",
+      "indexName": "brasserie-bot-knowledge"
+    },
+    "openai": {
+      "apiKey": "${OPENAI_API_KEY}",
+      "embeddingModel": "text-embedding-3-small"
+    },
+    "dataIngestion": {
+      "chunkSize": 1000,
+      "chunkOverlap": 200,
+      "batchSize": 100,
+      "sources": [
+        {
+          "type": "directory",
+          "path": "./knowledge/restaurant_management",
+          "pattern": "**/*.{md,txt,json}",
+          "category": "restaurant_management"
+        },
+        {
+          "type": "directory",
+          "path": "./knowledge/pos_integration",
+          "pattern": "**/*.{md,txt,json}",
+          "category": "pos_integration"
+        },
+        {
+          "type": "directory",
+          "path": "./knowledge/reservation_systems",
+          "pattern": "**/*.{md,txt,json}",
+          "category": "reservation_systems"
+        },
+        {
+          "type": "directory",
+          "path": "./knowledge/inventory_procurement",
+          "pattern": "**/*.{md,txt,json}",
+          "category": "inventory_procurement"
+        },
+        {
+          "type": "directory",
+          "path": "./knowledge/payment_processing",
+          "pattern": "**/*.{md,txt,json}",
+          "category": "payment_processing"
+        },
+        {
+          "type": "directory",
+          "path": "./knowledge/supplier_relations",
+          "pattern": "**/*.{md,txt,json}",
+          "category": "supplier_relations"
+        }
+      ],
+      "schedules": [
+        {
+          "name": "daily-update",
+          "cron": "0 0 * * *",
+          "sources": ["all"]
+        }
+      ]
+    },
+    "rag": {
+      "defaultLimit": 3,
+      "similarityThreshold": 0.7,
+      "promptTemplate": "I need to respond to the following prompt, and I have some relevant knowledge from the hospitality industry that might help:\n\nRELEVANT KNOWLEDGE:\n{{knowledge}}\n\nORIGINAL PROMPT:\n{{prompt}}\n\nPlease use the relevant knowledge above to inform your response to the original prompt. Incorporate domain-specific insights where appropriate."
+    },
+    "categories": [
+      {
+        "id": "restaurant_management",
+        "name": "Restaurant Management Systems",
+        "description": "Information about restaurant management software, features, and implementation"
+      },
+      {
+        "id": "pos_integration",
+        "name": "POS Integrations",
+        "description": "Details on integrating with Point of Sale systems"
+      },
+      {
+        "id": "reservation_systems",
+        "name": "Reservation Systems",
+        "description": "Information about restaurant reservation platforms and APIs"
+      },
+      {
+        "id": "inventory_procurement",
+        "name": "Inventory & Procurement",
+        "description": "Knowledge about inventory management and procurement processes"
+      },
+      {
+        "id": "payment_processing",
+        "name": "Payment Processing",
+        "description": "Information about payment systems and integrations"
+      },
+      {
+        "id": "supplier_relations",
+        "name": "Supplier Relations",
+        "description": "Knowledge about managing supplier relationships and payments"
+      }
+    ]
+  }
+}

@@ -1,0 +1,312 @@
+# BrasserieBot GCP Infrastructure - Datadog Helm Values
+
+# Datadog Agent configuration
+datadog:
+  # Datadog API key
+  apiKey: ${DATADOG_API_KEY}
+  
+  # Datadog site (EU)
+  site: datadoghq.eu
+  
+  # Datadog App key
+  appKey: ${DATADOG_APP_KEY}
+  
+  # Cluster name for Datadog
+  clusterName: brasserie-bot-cluster-prod
+  
+  # Log collection
+  logs:
+    enabled: true
+    containerCollectAll: true
+  
+  # APM configuration
+  apm:
+    enabled: true
+    portEnabled: true
+  
+  # Process collection
+  processAgent:
+    enabled: true
+    processCollection: true
+  
+  # Kubernetes events collection
+  kubeStateMetricsEnabled: true
+  
+  # Cluster checks
+  clusterChecks:
+    enabled: true
+  
+  # Dogstatsd
+  dogstatsd:
+    port: 8125
+    useHostPort: true
+    nonLocalTraffic: true
+  
+  # Tags
+  tags:
+    - "env:production"
+    - "service:brasserie-bot"
+    - "team:engineering"
+    - "managed-by:helm"
+
+# Datadog Cluster Agent
+clusterAgent:
+  enabled: true
+  metricsProvider:
+    enabled: true
+  
+  # Cluster checks
+  clusterChecks:
+    enabled: true
+
+# Kube-state-metrics
+kube-state-metrics:
+  enabled: true
+
+# Node configuration
+agents:
+  tolerations:
+    - operator: Exists
+  
+  # System probe for network performance monitoring
+  systemProbe:
+    enabled: true
+    enableTCPQueueLength: true
+    enableOOMKill: true
+    collectDNSStats: true
+  
+  # Container runtime monitoring
+  containers:
+    logCollection:
+      enabled: true
+    
+    # Runtime security
+    runtimeSecurity:
+      enabled: true
+
+# Custom checks for BrasserieBot
+customAgentConfig:
+  configMap:
+    name: datadog-agent-config
+    fileKey: datadog.yaml
+
+# AutoDev specific monitoring
+confd:
+  autodev.yaml: |-
+    init_config:
+    instances:
+      - name: autodev
+        url: http://brasserie-bot-autodev.brasserie-bot-autodev.svc.cluster.local:3001/metrics
+        metrics:
+          - autodev.tasks.completed
+          - autodev.tasks.failed
+          - autodev.knowledge_base.updates
+          - autodev.knowledge_base.queries
+          - autodev.system.latency
+          - autodev.system.memory_usage
+          - autodev.system.cpu_usage
+        tags:
+          - "component:autodev"
+          - "service:brasserie-bot"
+
+# Datadog Dashboard configuration
+dashboards:
+  - name: "BrasserieBot Overview"
+    layout_type: ordered
+    widgets:
+      - definition:
+          title: "Backend API Requests"
+          type: "timeseries"
+          requests:
+            - q: "sum:trace.http.request.hits{service:brasserie-bot-backend}.as_count()"
+              display_type: "line"
+      - definition:
+          title: "Frontend Page Views"
+          type: "timeseries"
+          requests:
+            - q: "sum:trace.http.request.hits{service:brasserie-bot-frontend}.as_count()"
+              display_type: "line"
+      - definition:
+          title: "API Response Time (p95)"
+          type: "timeseries"
+          requests:
+            - q: "p95:trace.http.request.duration{service:brasserie-bot-backend}"
+              display_type: "line"
+      - definition:
+          title: "Error Rate"
+          type: "timeseries"
+          requests:
+            - q: "sum:trace.http.request.errors{service:brasserie-bot-backend}.as_count() / sum:trace.http.request.hits{service:brasserie-bot-backend}.as_count() * 100"
+              display_type: "line"
+      - definition:
+          title: "Database Query Time (p95)"
+          type: "timeseries"
+          requests:
+            - q: "p95:trace.postgres.query.duration{service:brasserie-bot-backend}"
+              display_type: "line"
+      - definition:
+          title: "Memory Usage"
+          type: "timeseries"
+          requests:
+            - q: "avg:kubernetes.memory.usage_pct{kube_deployment:brasserie-bot-backend} by {pod_name}"
+              display_type: "line"
+            - q: "avg:kubernetes.memory.usage_pct{kube_deployment:brasserie-bot-frontend} by {pod_name}"
+              display_type: "line"
+            - q: "avg:kubernetes.memory.usage_pct{kube_deployment:brasserie-bot-autodev} by {pod_name}"
+              display_type: "line"
+      - definition:
+          title: "CPU Usage"
+          type: "timeseries"
+          requests:
+            - q: "avg:kubernetes.cpu.usage.total{kube_deployment:brasserie-bot-backend} by {pod_name}"
+              display_type: "line"
+            - q: "avg:kubernetes.cpu.usage.total{kube_deployment:brasserie-bot-frontend} by {pod_name}"
+              display_type: "line"
+            - q: "avg:kubernetes.cpu.usage.total{kube_deployment:brasserie-bot-autodev} by {pod_name}"
+              display_type: "line"
+
+  - name: "AutoDev Dashboard"
+    layout_type: ordered
+    widgets:
+      - definition:
+          title: "AutoDev Tasks Completed"
+          type: "timeseries"
+          requests:
+            - q: "sum:autodev.tasks.completed{*} by {task_type}.as_count()"
+              display_type: "bars"
+      - definition:
+          title: "AutoDev Tasks Failed"
+          type: "timeseries"
+          requests:
+            - q: "sum:autodev.tasks.failed{*} by {task_type}.as_count()"
+              display_type: "bars"
+      - definition:
+          title: "Knowledge Base Updates"
+          type: "timeseries"
+          requests:
+            - q: "sum:autodev.knowledge_base.updates{*} by {update_type}.as_count()"
+              display_type: "line"
+      - definition:
+          title: "Knowledge Base Queries"
+          type: "timeseries"
+          requests:
+            - q: "sum:autodev.knowledge_base.queries{*}.as_count()"
+              display_type: "line"
+      - definition:
+          title: "AutoDev System Latency"
+          type: "timeseries"
+          requests:
+            - q: "avg:autodev.system.latency{*}"
+              display_type: "line"
+      - definition:
+          title: "AutoDev Memory Usage"
+          type: "timeseries"
+          requests:
+            - q: "avg:autodev.system.memory_usage{*}"
+              display_type: "line"
+      - definition:
+          title: "AutoDev CPU Usage"
+          type: "timeseries"
+          requests:
+            - q: "avg:autodev.system.cpu_usage{*}"
+              display_type: "line"
+
+# Monitors
+monitors:
+  - name: "High API Error Rate"
+    type: "query alert"
+    query: "sum(last_5m):sum:trace.http.request.errors{service:brasserie-bot-backend}.as_count() / sum:trace.http.request.hits{service:brasserie-bot-backend}.as_count() * 100 > 5"
+    message: "API error rate is above 5% for the last 5 minutes. @slack-brasserie-bot-alerts"
+    tags:
+      - "service:brasserie-bot"
+      - "severity:warning"
+    options:
+      notify_no_data: true
+      no_data_timeframe: 10
+      new_host_delay: 300
+      evaluation_delay: 60
+      include_tags: true
+      thresholds:
+        critical: 5
+        warning: 2
+
+  - name: "High Database Response Time"
+    type: "query alert"
+    query: "avg(last_5m):p95:trace.postgres.query.duration{service:brasserie-bot-backend} > 500"
+    message: "Database response time is above 500ms for the last 5 minutes. @slack-brasserie-bot-alerts"
+    tags:
+      - "service:brasserie-bot"
+      - "severity:warning"
+    options:
+      notify_no_data: true
+      no_data_timeframe: 10
+      new_host_delay: 300
+      evaluation_delay: 60
+      include_tags: true
+      thresholds:
+        critical: 500
+        warning: 200
+
+  - name: "High Memory Usage"
+    type: "query alert"
+    query: "avg(last_5m):avg:kubernetes.memory.usage_pct{kube_deployment:brasserie-bot-backend} by {pod_name} > 85"
+    message: "Memory usage is above 85% for the last 5 minutes. @slack-brasserie-bot-alerts"
+    tags:
+      - "service:brasserie-bot"
+      - "severity:warning"
+    options:
+      notify_no_data: true
+      no_data_timeframe: 10
+      new_host_delay: 300
+      evaluation_delay: 60
+      include_tags: true
+      thresholds:
+        critical: 85
+        warning: 75
+
+  - name: "High CPU Usage"
+    type: "query alert"
+    query: "avg(last_5m):avg:kubernetes.cpu.usage.total{kube_deployment:brasserie-bot-backend} by {pod_name} > 80"
+    message: "CPU usage is above 80% for the last 5 minutes. @slack-brasserie-bot-alerts"
+    tags:
+      - "service:brasserie-bot"
+      - "severity:warning"
+    options:
+      notify_no_data: true
+      no_data_timeframe: 10
+      new_host_delay: 300
+      evaluation_delay: 60
+      include_tags: true
+      thresholds:
+        critical: 80
+        warning: 70
+
+  - name: "AutoDev System Error"
+    type: "log alert"
+    query: "logs(\"service:brasserie-bot-autodev status:error\").index(\"*\").rollup(\"count\").last(\"5m\") > 10"
+    message: "AutoDev system has reported more than 10 errors in the last 5 minutes. @slack-brasserie-bot-alerts"
+    tags:
+      - "service:brasserie-bot-autodev"
+      - "severity:error"
+    options:
+      notify_no_data: false
+      thresholds:
+        critical: 10
+        warning: 5
+
+  - name: "AutoDev Task Failure Rate"
+    type: "query alert"
+    query: "sum(last_15m):sum:autodev.tasks.failed{*}.as_count() / (sum:autodev.tasks.completed{*}.as_count() + sum:autodev.tasks.failed{*}.as_count()) * 100 > 20"
+    message: "AutoDev task failure rate is above 20% for the last 15 minutes. @slack-brasserie-bot-alerts"
+    tags:
+      - "service:brasserie-bot-autodev"
+      - "severity:warning"
+    options:
+      notify_no_data: true
+      no_data_timeframe: 30
+      new_host_delay: 300
+      evaluation_delay: 60
+      include_tags: true
+      thresholds:
+        critical: 20
+        warning: 10

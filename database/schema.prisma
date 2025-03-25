@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  password      String
+  firstName     String?
+  lastName      String?
+  role          UserRole       @default(USER)
+  restaurants   Restaurant[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  OWNER
+  MANAGER
+  STAFF
+  USER
+}
+
+// Restaurant model
+model Restaurant {
+  id              Int               @id @default(autoincrement())
+  name            String
+  description     String?
+  address         String
+  city            String
+  state           String
+  zipCode         String
+  phoneNumber     String
+  email           String?
+  website         String?
+  owner           User              @relation(fields: [ownerId], references: [id])
+  ownerId         Int
+  menus           Menu[]
+  suppliers       Supplier[]
+  orders          Order[]
+  reservations    Reservation[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+// Menu model
+model Menu {
+  id              Int               @id @default(autoincrement())
+  name            String
+  description     String?
+  restaurant      Restaurant        @relation(fields: [restaurantId], references: [id])
+  restaurantId    Int
+  items           MenuItem[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+// MenuItem model
+model MenuItem {
+  id              Int               @id @default(autoincrement())
+  name            String
+  description     String?
+  price           Float
+  menu            Menu              @relation(fields: [menuId], references: [id])
+  menuId          Int
+  orderItems      OrderItem[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+// Supplier model
+model Supplier {
+  id              Int               @id @default(autoincrement())
+  name            String
+  contactName     String?
+  email           String?
+  phoneNumber     String
+  address         String?
+  restaurant      Restaurant        @relation(fields: [restaurantId], references: [id])
+  restaurantId    Int
+  products        Product[]
+  payments        SupplierPayment[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+// Product model
+model Product {
+  id              Int               @id @default(autoincrement())
+  name            String
+  description     String?
+  price           Float
+  supplier        Supplier          @relation(fields: [supplierId], references: [id])
+  supplierId      Int
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+// Order model
+model Order {
+  id              Int               @id @default(autoincrement())
+  status          OrderStatus       @default(PENDING)
+  restaurant      Restaurant        @relation(fields: [restaurantId], references: [id])
+  restaurantId    Int
+  items           OrderItem[]
+  totalAmount     Float
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  DELIVERED
+  CANCELLED
+}
+
+// OrderItem model
+model OrderItem {
+  id              Int               @id @default(autoincrement())
+  order           Order             @relation(fields: [orderId], references: [id])
+  orderId         Int
+  menuItem        MenuItem          @relation(fields: [menuItemId], references: [id])
+  menuItemId      Int
+  quantity        Int
+  price           Float
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+// Reservation model
+model Reservation {
+  id              Int               @id @default(autoincrement())
+  restaurant      Restaurant        @relation(fields: [restaurantId], references: [id])
+  restaurantId    Int
+  customerName    String
+  customerEmail   String?
+  customerPhone   String
+  partySize       Int
+  reservationDate DateTime
+  status          ReservationStatus @default(CONFIRMED)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+// SupplierPayment model
+model SupplierPayment {
+  id              Int               @id @default(autoincrement())
+  supplier        Supplier          @relation(fields: [supplierId], references: [id])
+  supplierId      Int
+  amount          Float
+  status          PaymentStatus     @default(PENDING)
+  paymentDate     DateTime?
+  dueDate         DateTime
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+  CANCELLED
+}

@@ -1,0 +1,259 @@
+# BrasserieBot GCP Infrastructure - AutoDev Dashboard Deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: brasserie-bot-autodev-dashboard
+  namespace: brasserie-bot-autodev
+  labels:
+    app: brasserie-bot
+    component: autodev-dashboard
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: brasserie-bot
+      component: autodev-dashboard
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: brasserie-bot
+        component: autodev-dashboard
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3002"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: brasserie-bot-autodev
+      containers:
+      - name: dashboard
+        image: gcr.io/PROJECT_ID/brasserie-bot-autodev-dashboard:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3002
+          name: http
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3002"
+        - name: AUTODEV_SERVICE_URL
+          value: "http://brasserie-bot-autodev.brasserie-bot-autodev.svc.cluster.local:3001"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: url
+        - name: STORAGE_BUCKET
+          value: "brasserie-bot-assets-prod-autodev"
+        - name: PUBSUB_PROJECT_ID
+          value: "PROJECT_ID"
+        - name: PUBSUB_TOPIC
+          value: "autodev-events"
+        - name: PUBSUB_SUBSCRIPTION
+          value: "autodev-events-processor-sub"
+        - name: LOG_LEVEL
+          value: "info"
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+        - name: tmp-volume
+          mountPath: /tmp
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: config-volume
+        configMap:
+          name: autodev-dashboard-config
+      - name: tmp-volume
+        emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - brasserie-bot
+                - key: component
+                  operator: In
+                  values:
+                  - autodev-dashboard
+              topologyKey: kubernetes.io/hostname
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: brasserie-bot
+            component: autodev-dashboard
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: brasserie-bot-autodev-dashboard
+  namespace: brasserie-bot-autodev
+  labels:
+    app: brasserie-bot
+    component: autodev-dashboard
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/backend-config: '{"default": "brasserie-bot-autodev-dashboard-config"}'
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: brasserie-bot
+    component: autodev-dashboard
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: brasserie-bot-autodev-dashboard
+  namespace: brasserie-bot-autodev
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: brasserie-bot-autodev-dashboard
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      selectPolicy: Max
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: brasserie-bot-autodev-dashboard-config
+  namespace: brasserie-bot-autodev
+spec:
+  healthCheck:
+    checkIntervalSec: 15
+    timeoutSec: 5
+    healthyThreshold: 2
+    unhealthyThreshold: 3
+    type: HTTP
+    requestPath: /api/health
+    port: 80
+  securityPolicy:
+    name: "brasserie-bot-security-policy"
+  sessionAffinity:
+    affinityType: "GENERATED_COOKIE"
+    affinityCookieTtlSec: 3600
+  timeoutSec: 30
+  connectionDraining:
+    drainingTimeoutSec: 60
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: autodev-dashboard-config
+  namespace: brasserie-bot-autodev
+data:
+  dashboard-config.json: |
+    {
+      "version": "1.0",
+      "title": "BrasserieBot AutoDev Dashboard",
+      "refreshInterval": 30,
+      "metrics": {
+        "enabled": true,
+        "endpoint": "/metrics"
+      },
+      "sections": [
+        {
+          "name": "overview",
+          "title": "System Overview",
+          "widgets": ["status", "activity", "performance"]
+        },
+        {
+          "name": "tasks",
+          "title": "Development Tasks",
+          "widgets": ["task-queue", "task-history", "task-performance"]
+        },
+        {
+          "name": "knowledge",
+          "title": "Knowledge Base",
+          "widgets": ["knowledge-stats", "knowledge-updates", "knowledge-search"]
+        },
+        {
+          "name": "collaboration",
+          "title": "Human Collaboration",
+          "widgets": ["collaboration-points", "feedback", "approvals"]
+        }
+      ],
+      "notifications": {
+        "enabled": true,
+        "channels": ["dashboard", "email"]
+      }
+    }

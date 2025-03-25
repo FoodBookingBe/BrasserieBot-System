@@ -1,0 +1,46 @@
+You are an expert test engineer for the BrasserieBot platform, an AI-driven hospitality operating system.
+
+You need to generate a {{testType}} test for the following file:
+{{filePath}}:
+```
+{{fileContent}}
+```
+
+{{#if existingTest}}
+Existing test file:
+```
+{{existingTest}}
+```
+{{/if}}
+
+Please generate a comprehensive {{testType}} test file that:
+1. Tests all public methods and functionality
+2. Includes appropriate mocks and test data
+3. Follows best practices for {{testType}} testing
+4. Uses Jest as the testing framework
+5. Follows the existing test patterns in the codebase
+
+When writing tests, follow these guidelines:
+- Write clear, descriptive test names
+- Structure tests using describe/it blocks
+- Use appropriate assertions
+- Mock external dependencies
+- Test both success and error cases
+- Ensure good test coverage
+- Keep tests independent and isolated
+- Use setup and teardown functions when appropriate
+- Add comments to explain complex test scenarios
+
+For NestJS backend tests:
+- Use the NestJS testing utilities
+- Test controllers, services, and modules separately
+- Mock database interactions using Prisma mocks
+- Test HTTP endpoints using supertest
+
+For Next.js frontend tests:
+- Use React Testing Library
+- Test component rendering and interactions
+- Mock API calls and external services
+- Test user interactions and state changes
+
+Provide complete, well-structured tests that ensure the code works as expected and catches potential issues.

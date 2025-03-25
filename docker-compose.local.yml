@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:14
+    container_name: brasserie-bot-postgres
+    environment:
+      POSTGRES_USER: brasseriebot
+      POSTGRES_PASSWORD: localpassword
+      POSTGRES_DB: brasseriebot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U brasseriebot"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: brasserie-bot-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://brasseriebot:localpassword@postgres:5432/brasseriebot
+      JWT_SECRET: local_development_secret
+      CLAUDE_API_KEY: ${CLAUDE_API_KEY:-dummy_key}
+      PINECONE_API_KEY: ${PINECONE_API_KEY:-dummy_key}
+      AUTODEV_ENABLED: "true"
+      AUTODEV_SERVICE_URL: "http://autodev:3001"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run start:dev
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: brasserie-bot-frontend
+    depends_on:
+      - backend
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+    ports:
+      - "8000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # AutoDev system
+  autodev:
+    build:
+      context: ./autodev
+      dockerfile: Dockerfile
+    container_name: brasserie-bot-autodev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DASHBOARD_PORT: 8080
+      DATABASE_URL: postgresql://brasseriebot:localpassword@postgres:5432/brasseriebot
+      CLAUDE_API_KEY: ${CLAUDE_API_KEY:-dummy_key}
+      PINECONE_API_KEY: ${PINECONE_API_KEY:-dummy_key}
+      KNOWLEDGE_BASE_PATH: /app/knowledge
+      LOG_LEVEL: debug
+    ports:
+      - "3001:3001"
+      - "8080:8080"
+    volumes:
+      - ./autodev:/app
+      - /app/node_modules
+      - autodev_knowledge:/app/knowledge
+    command: npm run start:dev
+
+  # AutoDev Dashboard
+  autodev-dashboard:
+    build:
+      context: ./autodev
+      dockerfile: Dockerfile.dashboard
+    container_name: brasserie-bot-autodev-dashboard
+    depends_on:
+      - autodev
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      AUTODEV_SERVICE_URL: http://autodev:3001
+      DATABASE_URL: postgresql://brasseriebot:localpassword@postgres:5432/brasseriebot
+      LOG_LEVEL: debug
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./autodev:/app
+      - /app/node_modules
+    command: npm run dashboard:dev
+
+volumes:
+  postgres_data:
+  autodev_knowledge:

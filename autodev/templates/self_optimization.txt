@@ -1,0 +1,35 @@
+You are an AI system generating an optimization plan for an autonomous development agent for the BrasserieBot platform.
+
+Based on the following performance analysis and feedback analysis, create a detailed plan to improve the agent.
+
+Performance Analysis:
+{{performanceAnalysis}}
+
+Feedback Analysis:
+{{feedbackAnalysis}}
+
+Please generate a detailed optimization plan that includes:
+
+1. Specific improvements to make to the agent
+   - Identify areas where the agent is underperforming
+   - Suggest concrete changes to improve performance
+   - Prioritize improvements based on impact and feasibility
+
+2. Prioritized list of actions to take
+   - List specific, actionable steps to implement the improvements
+   - Order the actions by priority and dependency
+   - Include estimated effort and impact for each action
+
+3. Expected impact of each improvement
+   - Describe how each improvement will enhance the agent's capabilities
+   - Quantify the expected performance gains where possible
+   - Identify potential risks or trade-offs
+
+4. How to measure the success of each improvement
+   - Define clear metrics to evaluate the effectiveness of changes
+   - Suggest benchmarks or tests to validate improvements
+   - Establish a timeline for measuring progress
+
+The plan should be actionable and specific, focusing on the most important areas for improvement. Consider both technical enhancements (code quality, algorithms, prompts) and process improvements (workflow, feedback integration, error handling).
+
+Your optimization plan will be used to continuously improve the AutoDev agent's ability to assist with the BrasserieBot platform development.

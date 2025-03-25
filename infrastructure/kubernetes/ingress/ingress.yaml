@@ -1,0 +1,109 @@
+# BrasserieBot GCP Infrastructure - Ingress Configuration
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: brasserie-bot-ingress
+  namespace: brasserie-bot
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "brasserie-bot-ip"
+    networking.gke.io/managed-certificates: "brasserie-bot-cert,brasserie-bot-api-cert"
+    networking.gke.io/v1beta1.FrontendConfig: "brasserie-bot-frontend-config"
+    kubernetes.io/ingress.allow-http: "false"
+spec:
+  rules:
+  - host: brasserie-bot.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: brasserie-bot-frontend
+            port:
+              number: 80
+  - host: api.brasserie-bot.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: brasserie-bot-backend
+            port:
+              number: 80
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: brasserie-bot-cert
+  namespace: brasserie-bot
+spec:
+  domains:
+  - brasserie-bot.com
+  - www.brasserie-bot.com
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: brasserie-bot-api-cert
+  namespace: brasserie-bot
+spec:
+  domains:
+  - api.brasserie-bot.com
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: brasserie-bot-frontend-config
+  namespace: brasserie-bot
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT
+  sslPolicy: brasserie-bot-ssl-policy
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: brasserie-bot-autodev-dashboard-ingress
+  namespace: brasserie-bot-autodev
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "brasserie-bot-autodev-ip"
+    networking.gke.io/managed-certificates: "brasserie-bot-autodev-cert"
+    networking.gke.io/v1beta1.FrontendConfig: "brasserie-bot-autodev-frontend-config"
+    kubernetes.io/ingress.allow-http: "false"
+spec:
+  rules:
+  - host: autodev.brasserie-bot.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: brasserie-bot-autodev-dashboard
+            port:
+              number: 80
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: brasserie-bot-autodev-cert
+  namespace: brasserie-bot-autodev
+spec:
+  domains:
+  - autodev.brasserie-bot.com
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: brasserie-bot-autodev-frontend-config
+  namespace: brasserie-bot-autodev
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT
+  sslPolicy: brasserie-bot-ssl-policy

@@ -1,0 +1,117 @@
+# BrasserieBot GCP Infrastructure - Kubernetes ConfigMaps
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: brasserie-bot
+data:
+  app-config.json: |
+    {
+      "version": "1.0",
+      "environment": "production",
+      "logging": {
+        "level": "info",
+        "format": "json",
+        "stackTrace": false
+      },
+      "cors": {
+        "enabled": true,
+        "origins": [
+          "https://brasserie-bot.com",
+          "https://www.brasserie-bot.com",
+          "https://autodev.brasserie-bot.com"
+        ],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allowedHeaders": ["Content-Type", "Authorization"],
+        "exposedHeaders": [],
+        "credentials": true,
+        "maxAge": 86400
+      },
+      "rateLimit": {
+        "enabled": true,
+        "windowMs": 60000,
+        "max": 100,
+        "standardHeaders": true,
+        "legacyHeaders": false
+      },
+      "security": {
+        "helmet": {
+          "enabled": true,
+          "contentSecurityPolicy": {
+            "directives": {
+              "default-src": ["'self'"],
+              "script-src": ["'self'", "https://storage.googleapis.com"],
+              "img-src": ["'self'", "https://storage.googleapis.com", "data:"],
+              "style-src": ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
+              "font-src": ["'self'", "https://fonts.gstatic.com"],
+              "connect-src": ["'self'", "https://api.brasserie-bot.com"]
+            }
+          }
+        }
+      },
+      "autodev": {
+        "enabled": true,
+        "serviceUrl": "http://brasserie-bot-autodev.brasserie-bot-autodev.svc.cluster.local:3001",
+        "dashboardUrl": "https://autodev.brasserie-bot.com"
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: brasserie-bot
+data:
+  app-config.json: |
+    {
+      "version": "1.0",
+      "environment": "production",
+      "api": {
+        "url": "https://api.brasserie-bot.com",
+        "timeout": 30000
+      },
+      "storage": {
+        "url": "https://storage.googleapis.com/brasserie-bot-assets-prod-assets"
+      },
+      "features": {
+        "autodev": {
+          "enabled": true,
+          "dashboardUrl": "https://autodev.brasserie-bot.com"
+        }
+      },
+      "analytics": {
+        "enabled": true,
+        "googleAnalyticsId": "G-XXXXXXXXXX"
+      },
+      "sentry": {
+        "enabled": true,
+        "dsn": "https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@sentry.io/XXXXXXX",
+        "environment": "production"
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datadog-config
+  namespace: brasserie-bot
+data:
+  datadog.yaml: |
+    api_key: DATADOG_API_KEY
+    site: datadoghq.eu
+    logs_enabled: true
+    apm_config:
+      enabled: true
+    logs_config:
+      container_collect_all: true
+    process_config:
+      enabled: true
+    kubelet:
+      tls_verify: false
+    tags:
+      - env:production
+      - service:brasserie-bot
+      - version:1.0.0
+    use_dogstatsd: true
+    dogstatsd_port: 8125
