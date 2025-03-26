@@ -175,6 +175,8 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="improved-auth.js"></script>
+    <script src="accessibility.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize Lucide icons
@@ -185,36 +187,18 @@
             const errorMessage = document.getElementById('error-message');
             
             // Handle form submission
-            loginForm.addEventListener('submit', (e) => {
+            loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
                 
-                // Simple authentication for demo purposes
-                // In a real application, this would be handled by a secure backend
-                if (username === 'admin' && password === 'admin123') {
-                    // Store user info in localStorage (for demo purposes only)
-                    localStorage.setItem('brasseriebot_user', JSON.stringify({
-                        username: username,
-                        role: 'admin',
-                        restaurantName: 'Demo Restaurant',
-                        lastLogin: new Date().toISOString()
-                    }));
-                    
+                // Verbeterde authenticatie met hashing
+                const user = await BrasserieBotAuth.authenticate(username, password);
+                
+                if (user) {
                     // Redirect to dashboard
-                    window.location.href = 'dashboard-fixed.html';
-                } else if (username === 'user' && password === 'user123') {
-                    // Store user info in localStorage (for demo purposes only)
-                    localStorage.setItem('brasseriebot_user', JSON.stringify({
-                        username: username,
-                        role: 'user',
-                        restaurantName: 'Test Brasserie',
-                        lastLogin: new Date().toISOString()
-                    }));
-                    
-                    // Redirect to dashboard
-                    window.location.href = 'dashboard-fixed.html';
+                    window.location.href = 'dashboard.html';
                 } else {
                     // Show error message
                     errorMessage.classList.add('show');

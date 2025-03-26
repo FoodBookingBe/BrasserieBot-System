@@ -129,7 +129,7 @@
                     <button class="search-toggle" id="search-toggle" aria-label="Zoeken">
                         <i data-lucide="search"></i>
                     </button>
-                    <button class="notification-btn">
+                    <button class="notification-btn" aria-label="Notificaties">
                         <i data-lucide="bell"></i>
                         <span class="notification-badge"></span>
                     </button>
@@ -328,10 +328,10 @@
                                         <td>156</td>
                                         <td>2025-03-25</td>
                                         <td class="actions-cell">
-                                            <button class="icon-btn primary">
+                                            <button class="icon-btn primary" aria-label="Bewerken">
                                                 <i data-lucide="edit"></i>
                                             </button>
-                                            <button class="icon-btn danger">
+                                            <button class="icon-btn danger" aria-label="Verwijderen">
                                                 <i data-lucide="trash-2"></i>
                                             </button>
                                         </td>
@@ -610,6 +610,19 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="improved-auth.js"></script>
+    <script src="accessibility.js"></script>
     <script src="script.js"></script>
+    <script>
+        // Controleer authenticatie bij laden van pagina
+        document.addEventListener('DOMContentLoaded', () => {
+            // Controleer of gebruiker is ingelogd
+            const user = BrasserieBotAuth.checkAuth();
+            if (user) {
+                // Update UI gebaseerd op ingelogde gebruiker
+                BrasserieBotAuth.updateUIForUser(user);
+            }
+        });
+    </script>
 </body>
 </html>
