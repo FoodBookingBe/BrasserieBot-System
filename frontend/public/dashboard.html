@@ -8,6 +8,39 @@
     <link rel="stylesheet" href="responsive.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.363.0/dist/umd/lucide.min.css">
+    <style>
+        /* Uitlog knop styling */
+        .sidebar-logout-btn {
+            display: flex;
+            align-items: center;
+            background-color: transparent;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            color: #64748b;
+            padding: 8px 12px;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-logout-btn:hover {
+            background-color: #f1f5f9;
+            color: #0066cc;
+        }
+        
+        .sidebar-logout-btn i {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar-logout-btn {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -108,6 +141,10 @@
                         <p class="user-email">admin@brasseriebot.com</p>
                     </div>
                 </div>
+                <button id="logout-button" class="sidebar-logout-btn">
+                    <i data-lucide="log-out"></i>
+                    <span>Uitloggen</span>
+                </button>
             </div>
         </div>
 
@@ -666,6 +703,19 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
             sidebarOverlay.addEventListener('click', function() {
                 sidebar.classList.remove('mobile-active');
                 sidebarOverlay.classList.remove('active');
+            });
+        }
+        
+        // Uitlog functionaliteit toevoegen
+        const logoutButton = document.getElementById('logout-button');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function() {
+                // Verwijder user data uit localStorage
+                localStorage.removeItem('brasseriebot_user');
+                localStorage.removeItem('brasseriebot_auth_time');
+                
+                // Doorsturen naar login pagina
+                window.location.href = 'login.html';
             });
         }
         
