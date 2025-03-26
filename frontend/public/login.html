@@ -7,74 +7,77 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles-combined.css">
     <style>
-        /* Login-specifieke stijlen */
-        body {
-            background-color: #f5f7fa;
-            font-family: 'Inter', sans-serif;
+        /* Basis stijlen */
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
         }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f7fa;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
         .login-container {
-            background-color: #ffffff;
+            background-color: white;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-            padding: 40px;
             width: 100%;
             max-width: 400px;
-            position: relative;
-            overflow: hidden;
+            padding: 40px;
         }
-        .logo {
+
+        .login-header {
             text-align: center;
             margin-bottom: 30px;
         }
-        .logo img {
-            max-width: 180px;
+
+        .login-title {
+            color: #0066cc;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         .form-label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 500;
             color: #333;
+            font-size: 15px;
         }
+
         .form-input {
+            display: block;
             width: 100%;
             padding: 12px 16px;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #333;
+            background-color: #fff;
             border: 1px solid #d1d5db;
             border-radius: 6px;
-            font-size: 15px;
-            outline: none;
-            transition: border 0.3s, box-shadow 0.3s;
-            box-sizing: border-box;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
         }
+
         .form-input:focus {
             border-color: #0066cc;
-            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+            outline: 0;
+            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
         }
-        .primary-btn {
-            background-color: #0066cc;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 14px 20px;
-            font-size: 16px;
-            font-weight: 500;
-            width: 100%;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .primary-btn:hover {
-            background-color: #0052a3;
-        }
+
         .error-message {
             background-color: #fee2e2;
             color: #b91c1c;
@@ -84,112 +87,133 @@
             font-size: 14px;
             display: none;
         }
+
         .error-message.show {
             display: block;
         }
+
+        .login-button {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+        }
+
+        .login-button:hover {
+            background-color: #0052a3;
+        }
+
+        .login-button:focus {
+            outline: 0;
+            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.4);
+        }
+
         .login-footer {
             text-align: center;
             margin-top: 30px;
-            color: #6b7280;
+            color: #666;
             font-size: 14px;
         }
+
         /* Mobile responsiveness */
-        @media (max-width: 500px) {
+        @media (max-width: 480px) {
             .login-container {
-                max-width: 100%;
-                border-radius: 0;
-                box-shadow: none;
-                padding: 20px;
-            }
-            body {
-                background-color: #ffffff;
+                padding: 30px 20px;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
-        <div class="logo">
-            <h2 style="color: #0066cc;">BrasserieBot</h2>
+        <div class="login-header">
+            <h1 class="login-title">BrasserieBot</h1>
         </div>
-        
+
         <div id="error-message" class="error-message">
             Ongeldige gebruikersnaam of wachtwoord. Probeer het opnieuw.
         </div>
-        
-        <form id="login-form" method="post" onsubmit="return handleLogin(event)">
+
+        <form id="login-form">
             <div class="form-group">
                 <label for="username" class="form-label">Gebruikersnaam</label>
-                <input type="text" id="username" name="username" class="form-input" placeholder="Uw gebruikersnaam" autocomplete="username" required>
+                <input type="text" id="username" name="username" class="form-input" placeholder="Vul gebruikersnaam in" autocomplete="username" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="password" class="form-label">Wachtwoord</label>
-                <input type="password" id="password" name="password" class="form-input" placeholder="Uw wachtwoord" autocomplete="current-password" required>
+                <input type="password" id="password" name="password" class="form-input" placeholder="Vul wachtwoord in" autocomplete="current-password" required>
             </div>
-            
-            <button type="submit" class="primary-btn">
-                Inloggen
-            </button>
+
+            <button type="submit" class="login-button">Inloggen</button>
         </form>
-        
+
         <div class="login-footer">
             &copy; 2025 BrasserieBot - Alle rechten voorbehouden
         </div>
     </div>
-    
+
     <script>
-    // Login handler functie
-    function handleLogin(event) {
-        event.preventDefault();
-
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const errorMessage = document.getElementById('error-message');
-        
-        // Simple validation
-        if (!username || !password) {
-            errorMessage.textContent = "Vul alle velden in.";
-            errorMessage.classList.add('show');
-            return false;
-        }
-        
-        // Demo-gebruikers controleren
-        if ((username === 'admin' && password === 'admin123') || 
-            (username === 'user' && password === 'user123')) {
+        // Wacht tot de DOM volledig is geladen
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check voor bestaande sessie
+            const userJson = localStorage.getItem('brasseriebot_user');
+            const authTime = localStorage.getItem('brasseriebot_auth_time');
             
-            // Gebruiker opslaan in localStorage
-            const user = {
-                username: username,
-                role: username === 'admin' ? 'admin' : 'user',
-                restaurantName: username === 'admin' ? 'Demo Restaurant' : 'Test Brasserie',
-                lastLogin: new Date().toISOString()
-            };
-
-            localStorage.setItem('brasseriebot_user', JSON.stringify(user));
-            localStorage.setItem('brasseriebot_auth_time', Date.now());
+            // Als gebruiker al is ingelogd en sessie niet is verlopen
+            if (userJson && authTime && (Date.now() - parseInt(authTime)) < (24 * 60 * 60 * 1000)) {
+                window.location.href = 'dashboard.html';
+            }
             
-            // Doorsturen naar dashboard
-            window.location.href = 'dashboard.html';
-            return true;
-        } else {
-            // Toon foutmelding bij onjuiste gegevens
-            errorMessage.classList.add('show');
-            document.getElementById('password').value = '';
-            return false;
-        }
-    }
-
-    // Controleer of we al een sessie hebben bij laden pagina
-    document.addEventListener('DOMContentLoaded', function() {
-        const userJson = localStorage.getItem('brasseriebot_user');
-        const authTime = localStorage.getItem('brasseriebot_auth_time');
-        
-        // Als er een gebruiker is én de sessie niet verlopen is (24 uur)
-        if (userJson && authTime && (Date.now() - parseInt(authTime)) < 24 * 60 * 60 * 1000) {
-            window.location.href = 'dashboard.html';
-        }
-    });
+            // Login formulier afhandeling
+            const loginForm = document.getElementById('login-form');
+            const errorMessage = document.getElementById('error-message');
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+                
+                // Eenvoudige validatie
+                if (!username || !password) {
+                    errorMessage.textContent = 'Vul alle velden in a.u.b.';
+                    errorMessage.classList.add('show');
+                    return;
+                }
+                
+                // Demo gebruikers (in productie zou je deze info van de server halen)
+                if ((username === 'admin' && password === 'admin123') || 
+                    (username === 'user' && password === 'user123')) {
+                    
+                    // Opslaan in localStorage voor sessie
+                    const userData = {
+                        username: username,
+                        role: username === 'admin' ? 'admin' : 'user',
+                        restaurantName: username === 'admin' ? 'Demo Restaurant' : 'Test Brasserie',
+                        lastLogin: new Date().toISOString()
+                    };
+                    
+                    localStorage.setItem('brasseriebot_user', JSON.stringify(userData));
+                    localStorage.setItem('brasseriebot_auth_time', Date.now().toString());
+                    
+                    // Doorsturen naar dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // Foutmelding tonen
+                    errorMessage.textContent = 'Ongeldige gebruikersnaam of wachtwoord. Probeer het opnieuw.';
+                    errorMessage.classList.add('show');
+                    document.getElementById('password').value = '';
+                }
+            });
+        });
     </script>
 </body>
 </html>
