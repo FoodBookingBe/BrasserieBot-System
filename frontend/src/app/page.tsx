@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -70,7 +69,7 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold mb-2">Modular Dashboard</h3>
-              <p className="text-gray-600">Customizable dashboard system tailored to your restaurant's specific needs.</p>
+              <p className="text-gray-600">Customizable dashboard system tailored to your restaurant&apos;s specific needs.</p>
             </div>
             
             {/* Feature 2 */}

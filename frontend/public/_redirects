@@ -1,0 +1,20 @@
+# Netlify _redirects bestand voor foodbookingai.netlify.app
+# Deze regels worden altijd toegepast, zelfs als er conflicten zijn met netlify.toml
+
+# Forceer HTTPS voor alle requests
+http://foodbookingai.netlify.app/* https://foodbookingai.netlify.app/:splat 301!
+
+# API proxy voor CORS problemen
+/api/* https://brasserie-bot-api.onrender.com/:splat 200
+
+# Netlify Functions
+/.netlify/functions/* /.netlify/functions/:splat 200
+
+# SPA fallback - alle routes naar index.html voor client-side routing
+/* /index.html 200
+
+# Extra veiligheid - blokkeer toegang tot bepaalde bestanden
+/.env* /404.html 404
+/.git* /404.html 404
+/.github* /404.html 404
+/node_modules/* /404.html 404

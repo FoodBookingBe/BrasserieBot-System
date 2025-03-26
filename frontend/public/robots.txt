@@ -1,0 +1,41 @@
+# robots.txt voor foodbookingai.netlify.app
+# Version 1.0 - 26-03-2025
+
+User-agent: *
+Allow: /
+
+# Belangrijke pagina's voor indexering
+Allow: /dashboard
+Allow: /menu
+Allow: /reservations
+Allow: /order
+Allow: /about
+Allow: /contact
+
+# Sitemap locatie
+Sitemap: https://foodbookingai.netlify.app/sitemap.xml
+
+# Voorkom indexering van test- en interne pagina's
+Disallow: /api/
+Disallow: /admin/
+Disallow: /test/
+Disallow: /dev-*
+Disallow: /_next/static/
+
+# Voorkom crawling van assets (behalve als ze belangrijk zijn voor SEO)
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.svg$
+Allow: /*.webp$
+
+# Crawl rate control voor grote bots
+User-agent: AdsBot-Google
+Crawl-delay: 1
+
+User-agent: Googlebot
+Crawl-delay: 2
+
+User-agent: bingbot
+Crawl-delay: 5

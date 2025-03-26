@@ -1,0 +1,8 @@
+{
+  "extends": ["../.eslintrc"],
+  "root": true,
+  "rules": {
+    "prettier/prettier": ["off"],
+    "linebreak-style": ["off"]
+  }
+}

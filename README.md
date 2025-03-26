@@ -1,5 +1,7 @@
 # BrasserieBot - AI-Driven Hospitality Operating System
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/54f0d686-505e-42c9-a1e4-bd88412d859c/deploy-status)](https://app.netlify.com/sites/foodbookingai/deploys)
+
 BrasserieBot is a comprehensive AI-powered platform designed to revolutionize restaurant operations. This system provides a complete solution for hospitality businesses, leveraging artificial intelligence to optimize operations, increase profitability, and enhance customer experience.
 
 ## Core Features
