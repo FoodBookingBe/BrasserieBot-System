@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.363.0/dist/umd/lucide.min.css">
     <style>
         body {
-            background-color: var(--background-color);
+            background-color: #f5f7fa;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -19,9 +19,9 @@
         }
         
         .login-container {
-            background-color: var(--card-background);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
             padding: 40px;
@@ -33,14 +33,16 @@
         }
         
         .login-logo h1 {
-            color: var(--primary-color);
+            color: #0066cc;
             font-size: 1.8rem;
             margin-bottom: 5px;
+            font-family: 'Inter', sans-serif;
         }
         
         .login-logo p {
-            color: var(--text-muted);
+            color: #6c757d;
             font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
         }
         
         .login-form {
@@ -56,33 +58,37 @@
             margin-bottom: 8px;
             font-weight: 500;
             font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
         }
         
         .input-field {
             width: 100%;
             padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
             font-size: 0.9rem;
             transition: border-color 0.3s;
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
         }
         
         .input-field:focus {
             outline: none;
-            border-color: var(--primary-color);
+            border-color: #0066cc;
         }
         
         .login-btn {
             width: 100%;
             padding: 12px;
-            background-color: var(--primary-color);
+            background-color: #0066cc;
             color: white;
             border: none;
-            border-radius: var(--border-radius);
+            border-radius: 4px;
             font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.3s;
+            font-family: 'Inter', sans-serif;
         }
         
         .login-btn:hover {
@@ -93,6 +99,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 20px;
+            font-family: 'Inter', sans-serif;
         }
         
         .remember-me input {
@@ -105,9 +112,10 @@
         }
         
         .forgot-password a {
-            color: var(--primary-color);
+            color: #0066cc;
             text-decoration: none;
             font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
         }
         
         .forgot-password a:hover {
@@ -115,13 +123,14 @@
         }
         
         .error-message {
-            background-color: var(--danger-light);
-            color: var(--danger-color);
+            background-color: #f8d7da;
+            color: #721c24;
             padding: 10px;
-            border-radius: var(--border-radius);
+            border-radius: 4px;
             margin-bottom: 20px;
             font-size: 0.85rem;
             display: none;
+            font-family: 'Inter', sans-serif;
         }
         
         .error-message.show {
@@ -143,12 +152,12 @@
         <form class="login-form" id="login-form">
             <div class="form-group">
                 <label for="username">Gebruikersnaam</label>
-                <input type="text" id="username" name="username" class="input-field" placeholder="Voer uw gebruikersnaam in" required>
+                <input type="text" id="username" name="username" class="input-field" placeholder="Voer uw gebruikersnaam in" required value="admin">
             </div>
             
             <div class="form-group">
                 <label for="password">Wachtwoord</label>
-                <input type="password" id="password" name="password" class="input-field" placeholder="Voer uw wachtwoord in" required>
+                <input type="password" id="password" name="password" class="input-field" placeholder="Voer uw wachtwoord in" required autocomplete="current-password">
             </div>
             
             <div class="remember-me">
