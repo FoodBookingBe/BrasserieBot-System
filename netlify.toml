@@ -7,8 +7,15 @@
 # Redirects for direct access to dashboard
 [[redirects]]
   from = "/"
-  to = "/dashboard-fixed.html"
+  to = "/login.html"
   status = 302
+  force = true
+
+# Redirect van oudere dashboard naar nieuwe dashboard pagina
+[[redirects]]
+  from = "/dashboard-fixed.html"
+  to = "/dashboard.html"
+  status = 301
   force = true
 
 # Cache headers for better performance
