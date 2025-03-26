@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BrasserieBot Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles-combined.css">
     <link rel="stylesheet" href="responsive.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.363.0/dist/umd/lucide.min.css">
@@ -328,10 +328,10 @@
                                         <td>156</td>
                                         <td>2025-03-25</td>
                                         <td class="actions-cell">
-                                            <button class="icon-btn primary" aria-label="Bewerken">
+                                            <button class="icon-btn primary" title="Bewerk reservations tabel">
                                                 <i data-lucide="edit"></i>
                                             </button>
-                                            <button class="icon-btn danger" aria-label="Verwijderen">
+                                            <button class="icon-btn danger" title="Verwijder reservations tabel">
                                                 <i data-lucide="trash-2"></i>
                                             </button>
                                         </td>
@@ -346,10 +346,10 @@
                                         <td>342</td>
                                         <td>2025-03-24</td>
                                         <td class="actions-cell">
-                                            <button class="icon-btn primary">
+                                            <button class="icon-btn primary" title="Bewerk customers tabel">
                                                 <i data-lucide="edit"></i>
                                             </button>
-                                            <button class="icon-btn danger">
+                                            <button class="icon-btn danger" title="Verwijder customers tabel">
                                                 <i data-lucide="trash-2"></i>
                                             </button>
                                         </td>
@@ -364,10 +364,10 @@
                                         <td>78</td>
                                         <td>2025-03-20</td>
                                         <td class="actions-cell">
-                                            <button class="icon-btn primary">
+                                            <button class="icon-btn primary" title="Bewerk menu_items tabel">
                                                 <i data-lucide="edit"></i>
                                             </button>
-                                            <button class="icon-btn danger">
+                                            <button class="icon-btn danger" title="Verwijder menu_items tabel">
                                                 <i data-lucide="trash-2"></i>
                                             </button>
                                         </td>
@@ -407,7 +407,8 @@
                             <h3>Database herstellen</h3>
                             <p>Herstel uw database vanuit een eerder gemaakte backup</p>
                             <div class="file-upload-container">
-                                <input type="file" class="file-input">
+                                <label for="backup-file">Selecteer backup bestand</label>
+                                <input type="file" id="backup-file" class="file-input" title="Selecteer backup bestand">
                                 <button class="secondary-btn">Herstellen</button>
                             </div>
                         </div>
@@ -434,7 +435,7 @@
                     <div class="tab-content active" id="test-content">
                         <div class="form-group">
                             <label for="prompt-template">Selecteer template of maak een nieuwe</label>
-                            <select id="prompt-template" class="input-field">
+                            <select id="prompt-template" class="input-field" title="Selecteer een template">
                                 <option value="">Selecteer een template of maak een nieuwe...</option>
                                 <option value="1">Feature Planning - Ontwikkeling</option>
                                 <option value="2">Horeca Processen - Domeinkennis</option>
@@ -480,7 +481,8 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
                                 <input type="text" class="search-input" placeholder="Zoek in geschiedenis...">
                             </div>
                             <div class="filter-actions">
-                                <select class="input-field small">
+                                <label for="category-filter" class="sr-only">Filter op categorie</label>
+                                <select id="category-filter" class="input-field small" title="Filter op categorie">
                                     <option>Alle categorieën</option>
                                     <option>Ontwikkeling</option>
                                     <option>Domeinkennis</option>
@@ -498,10 +500,10 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
                                         <p>25 maart 2025, 14:32</p>
                                     </div>
                                     <div class="history-actions">
-                                        <button class="icon-btn primary">
+                                        <button class="icon-btn primary" title="Bewerk prompt">
                                             <i data-lucide="edit"></i>
                                         </button>
-                                        <button class="icon-btn">
+                                        <button class="icon-btn" title="Voer prompt opnieuw uit">
                                             <i data-lucide="play"></i>
                                         </button>
                                     </div>
@@ -524,10 +526,10 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
                                         <p>24 maart 2025, 09:15</p>
                                     </div>
                                     <div class="history-actions">
-                                        <button class="icon-btn primary">
+                                        <button class="icon-btn primary" title="Bewerk prompt">
                                             <i data-lucide="edit"></i>
                                         </button>
-                                        <button class="icon-btn">
+                                        <button class="icon-btn" title="Voer prompt opnieuw uit">
                                             <i data-lucide="play"></i>
                                         </button>
                                     </div>
@@ -552,7 +554,7 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
                             
                             <div class="form-group">
                                 <label for="ai-model">AI Model</label>
-                                <select id="ai-model" class="input-field">
+                                <select id="ai-model" class="input-field" title="Selecteer AI Model">
                                     <option value="claude-3-7">Claude 3.7 (Aanbevolen)</option>
                                     <option value="claude-3-5">Claude 3.5</option>
                                     <option value="gpt-4o">GPT-4o</option>
@@ -609,24 +611,139 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
         </div>
     </div>
 
-    <script src="fallback.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script src="auto-a11y.js"></script>
-    <script src="api-client.js"></script>
-    <script src="improved-auth.js"></script>
-    <script src="accessibility.js"></script>
-    <script src="dashboard-data.js"></script>
-    <script src="script.js"></script>
     <script>
-        // Controleer authenticatie bij laden van pagina
-        document.addEventListener('DOMContentLoaded', () => {
-            // Controleer of gebruiker is ingelogd
-            const user = BrasserieBotAuth.checkAuth();
-            if (user) {
-                // Update UI gebaseerd op ingelogde gebruiker
-                BrasserieBotAuth.updateUIForUser(user);
+    // Eenvoudige authenticatie controle
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check of de gebruiker is ingelogd
+        const userJson = localStorage.getItem('brasseriebot_user');
+        if (!userJson) {
+            window.location.href = 'login.html';
+        }
+        
+        // Update de gebruikersinformatie
+        try {
+            const user = JSON.parse(userJson);
+            const userAvatar = document.querySelector('.user-avatar span');
+            const userName = document.querySelector('.user-name');
+            const userEmail = document.querySelector('.user-email');
+            const welcomeText = document.querySelector('.welcome-text span');
+            
+            if (userAvatar && user.username) {
+                const initials = user.username.substring(0, 2).toUpperCase();
+                userAvatar.textContent = initials;
             }
+            
+            if (userName && user.restaurantName) {
+                userName.textContent = user.restaurantName;
+            }
+            
+            if (userEmail && user.username) {
+                userEmail.textContent = user.username + '@brasseriebot.com';
+            }
+            
+            if (welcomeText && user.username) {
+                welcomeText.textContent = 'Welkom, ' + user.username;
+            }
+        } catch (error) {
+            console.error('Fout bij parsen gebruikersdata:', error);
+        }
+
+        // Initialiseer Lucide iconen
+        lucide.createIcons();
+        
+        // Event listener voor menu toggle op mobiel
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        
+        if (menuToggle && sidebar && sidebarOverlay) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('mobile-active');
+                sidebarOverlay.classList.toggle('active');
+            });
+            
+            sidebarOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('mobile-active');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
+        
+        // Event listeners voor navigatie links
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Verwijder 'active' class van alle nav items
+                navLinks.forEach(navLink => {
+                    navLink.parentElement.classList.remove('active');
+                });
+                
+                // Voeg 'active' class toe aan het geklikte item
+                this.parentElement.classList.add('active');
+                
+                // Haal de target pagina ID op (zonder #)
+                const targetId = this.getAttribute('href').substring(1);
+                
+                // Toon de juiste pagina content
+                showPage(targetId);
+                
+                // Sluit mobiel menu als nodig
+                if (window.innerWidth <= 768 && sidebar && sidebarOverlay) {
+                    sidebar.classList.remove('mobile-active');
+                    sidebarOverlay.classList.remove('active');
+                }
+            });
         });
+        
+        // Tab navigatie
+        const tabButtons = document.querySelectorAll('.tab');
+        if (tabButtons) {
+            tabButtons.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabSet = this.parentElement;
+                    const tabId = this.getAttribute('data-tab');
+                    const tabContentId = tabId + '-content';
+                    
+                    // Deactiveer alle tabs in deze set
+                    tabSet.querySelectorAll('.tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    
+                    // Activeer deze tab
+                    this.classList.add('active');
+                    
+                    // Verberg alle tab content
+                    const tabContents = tabSet.parentElement.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Toon de juiste tab content
+                    const activeContent = document.getElementById(tabContentId);
+                    if (activeContent) {
+                        activeContent.classList.add('active');
+                    }
+                });
+            });
+        }
+    });
+
+    // Functie voor het tonen van een specifieke pagina
+    function showPage(pageId) {
+        // Verberg alle content pagina's
+        const contentPages = document.querySelectorAll('.content');
+        contentPages.forEach(page => {
+            page.classList.add('hidden');
+        });
+        
+        // Toon de geselecteerde pagina
+        const targetPage = document.getElementById(pageId + '-content');
+        if (targetPage) {
+            targetPage.classList.remove('hidden');
+        }
+    }
     </script>
 </body>
 </html>

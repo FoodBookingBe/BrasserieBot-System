@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles-combined.css">
     <style>
-        /* Inline essentiële stijlen voor snellere weergave */
+        /* Login-specifieke stijlen */
         body {
             background-color: #f5f7fa;
             font-family: 'Inter', sans-serif;
@@ -119,12 +119,12 @@
         <form id="login-form">
             <div class="form-group">
                 <label for="username" class="form-label">Gebruikersnaam</label>
-                <input type="text" id="username" class="form-input" placeholder="Uw gebruikersnaam" required>
+                <input type="text" id="username" class="form-input" placeholder="Uw gebruikersnaam" autocomplete="username" required>
             </div>
             
             <div class="form-group">
                 <label for="password" class="form-label">Wachtwoord</label>
-                <input type="password" id="password" class="form-input" placeholder="Uw wachtwoord" required>
+                <input type="password" id="password" class="form-input" placeholder="Uw wachtwoord" autocomplete="current-password" required>
             </div>
             
             <button type="submit" class="primary-btn">
@@ -138,186 +138,42 @@
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
-    
     <script>
-        // Basisauthenticatie functionaliteit (fallback)
-        document.addEventListener('DOMContentLoaded', function() {
-            // Lokale gebruikers data voor authenticatie
-            const userDatabase = {
-                "admin": {
-                    passwordHash: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", // admin123
-                    role: "admin",
-                    restaurantName: "Demo Restaurant"
-                },
-                "user": {
-                    passwordHash: "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c", // user123
-                    role: "user", 
-                    restaurantName: "Test Brasserie"
-                }
-            };
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inlogformulier afhandeling
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
+
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
             
-            // Helper functie voor wachtwoord hashing
-            async function hashPassword(password) {
-                try {
-                    const encoder = new TextEncoder();
-                    const data = encoder.encode(password);
-                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-                    const hashArray = Array.from(new Uint8Array(hashBuffer));
-                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-                    return hashHex;
-                } catch (e) {
-                    console.error('Hash error:', e);
-                    // Eenvoudige fallback hash voor oudere browsers
-                    return String(password).split('').reduce((a, b) => {
-                        a = (a << 5) - a + b.charCodeAt(0);
-                        return a & a;
-                    }, 0).toString();
-                }
-            }
-            
-            // Eenvoudige authenticatie functie
-            async function authenticate(username, password) {
-                console.log('Login poging:', username);
+            // Demo-gebruikers controleren
+            if ((username === 'admin' && password === 'admin123') || 
+                (username === 'user' && password === 'user123')) {
                 
-                try {
-                    // Als de API client beschikbaar is, probeer die eerst
-                    if (window.BrasserieBotAPI && window.BrasserieBotAPI.auth) {
-                        try {
-                            const user = await window.BrasserieBotAPI.auth.login(username, password);
-                            if (user) {
-                                console.log('API login succesvol');
-                                localStorage.setItem('brasseriebot_user', JSON.stringify({
-                                    username: username,
-                                    role: user.role || 'USER',
-                                    restaurantName: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Demo Restaurant',
-                                    lastLogin: new Date().toISOString(),
-                                }));
-                                localStorage.setItem('brasseriebot_auth_time', Date.now());
-                                return user;
-                            }
-                        } catch (apiError) {
-                            console.warn('API auth error:', apiError);
-                        }
-                    }
-                    
-                    // Fallback naar lokale authenticatie
-                    // Controleer admin gebruiker
-                    if (username === 'admin' && password === 'admin123') {
-                        const user = {
-                            username: 'admin',
-                            role: 'admin',
-                            restaurantName: 'Demo Restaurant',
-                            lastLogin: new Date().toISOString()
-                        };
-                        
-                        localStorage.setItem('brasseriebot_user', JSON.stringify(user));
-                        localStorage.setItem('brasseriebot_auth_time', Date.now());
-                        return user;
-                    }
-                    
-                    // Controleer standaard gebruiker
-                    if (username === 'user' && password === 'user123') {
-                        const user = {
-                            username: 'user',
-                            role: 'user',
-                            restaurantName: 'Test Brasserie',
-                            lastLogin: new Date().toISOString()
-                        };
-                        
-                        localStorage.setItem('brasseriebot_user', JSON.stringify(user));
-                        localStorage.setItem('brasseriebot_auth_time', Date.now());
-                        return user;
-                    }
+                // Gebruiker opslaan in localStorage
+                const user = {
+                    username: username,
+                    role: username === 'admin' ? 'admin' : 'user',
+                    restaurantName: username === 'admin' ? 'Demo Restaurant' : 'Test Brasserie',
+                    lastLogin: new Date().toISOString()
+                };
 
-                    // Probeer hashing (meer werk maar veiliger)
-                    const passwordHash = await hashPassword(password);
-                    const user = userDatabase[username];
-                    
-                    if (user && passwordHash === user.passwordHash) {
-                        const authenticatedUser = {
-                            username: username,
-                            role: user.role,
-                            restaurantName: user.restaurantName,
-                            lastLogin: new Date().toISOString()
-                        };
-                        
-                        localStorage.setItem('brasseriebot_user', JSON.stringify(authenticatedUser));
-                        localStorage.setItem('brasseriebot_auth_time', Date.now());
-                        return authenticatedUser;
-                    }
-                    
-                    return null;
-                } catch (e) {
-                    console.error('Authenticatie fout:', e);
-                    return null;
-                }
-            }
-            
-            // Setup login formulier
-            const loginForm = document.getElementById('login-form');
-            if (loginForm) {
-                loginForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                    const username = document.getElementById('username').value;
-                    const password = document.getElementById('password').value;
-                    const errorMessage = document.getElementById('error-message');
-                    
-                    // Toon even een laad-indicator
-                    const submitButton = loginForm.querySelector('button[type="submit"]');
-                    const originalButtonText = submitButton.innerHTML;
-                    submitButton.innerHTML = '<span>Bezig met inloggen...</span>';
-                    submitButton.disabled = true;
-                    
-                    try {
-                        const user = await authenticate(username, password);
-                        
-                        if (user) {
-                            // Redirect to dashboard
-                            window.location.href = 'dashboard.html';
-                        } else {
-                            // Show error message
-                            if (errorMessage) {
-                                errorMessage.classList.add('show');
-                            }
-                            
-                            // Clear password field
-                            if (document.getElementById('password')) {
-                                document.getElementById('password').value = '';
-                            }
-                            
-                            // Herstel button
-                            submitButton.innerHTML = originalButtonText;
-                            submitButton.disabled = false;
-                        }
-                    } catch (error) {
-                        console.error('Login error:', error);
-                        
-                        // Toon foutmelding
-                        if (errorMessage) {
-                            errorMessage.textContent = 'Er is een fout opgetreden bij het inloggen. Probeer het later opnieuw.';
-                            errorMessage.classList.add('show');
-                        }
-                        
-                        // Herstel button
-                        submitButton.innerHTML = originalButtonText;
-                        submitButton.disabled = false;
-                    }
-                });
-            }
-
-            // Initialize any Lucide icons
-            if (window.lucide) {
-                lucide.createIcons();
+                localStorage.setItem('brasseriebot_user', JSON.stringify(user));
+                localStorage.setItem('brasseriebot_auth_time', Date.now());
+                
+                // Doorsturen naar dashboard
+                window.location.href = 'dashboard.html';
+            } else {
+                // Toon foutmelding bij onjuiste gegevens
+                errorMessage.classList.add('show');
+                document.getElementById('password').value = '';
             }
         });
+    });
     </script>
-
-    <!-- Externe scripts - alleen geladen als ze beschikbaar zijn -->
-    <script src="fallback.js"></script>
-    <script src="auto-a11y.js"></script>
-    <script src="api-client.js"></script>
-    <script src="improved-auth.js"></script>
-    <script src="accessibility.js"></script>
 </body>
 </html>

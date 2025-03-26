@@ -73,47 +73,20 @@
     <a href="login.html" class="btn">Klik hier als u niet automatisch wordt doorgestuurd</a>
     
     <script>
-        // Basisveiligheidscontrole voor authenticatie
-        (function() {
-            // Eenvoudige check voor bestaande sessie
-            function checkAuth() {
-                try {
-                    const userJson = localStorage.getItem('brasseriebot_user');
-                    if (!userJson) {
-                        return null;
-                    }
-                    
-                    // Controleer sessie verlopen (24 uur)
-                    const authTime = localStorage.getItem('brasseriebot_auth_time');
-                    if (authTime && (Date.now() - parseInt(authTime)) > 24 * 60 * 60 * 1000) {
-                        // Sessie verlopen, uitloggen
-                        localStorage.removeItem('brasseriebot_user');
-                        localStorage.removeItem('brasseriebot_auth_time');
-                        return null;
-                    }
-                    
-                    // Parse gebruiker
-                    return JSON.parse(userJson);
-                } catch (e) {
-                    console.error('Fout bij authenticatiecheck:', e);
-                    return null;
-                }
+        // Controleer eerst of er een bestaande sessie is
+        const userJson = localStorage.getItem('brasseriebot_user');
+        const authTime = localStorage.getItem('brasseriebot_auth_time');
+        
+        // Redirect na korte vertraging voor betere gebruikerservaring
+        setTimeout(function() {
+            // Als er een gebruiker is én de sessie niet verlopen is (24 uur)
+            if (userJson && authTime && (Date.now() - parseInt(authTime)) < 24 * 60 * 60 * 1000) {
+                window.location.href = 'dashboard.html';
+            } else {
+                // Gebruiker is niet ingelogd of sessie is verlopen
+                window.location.href = 'login.html';
             }
-            
-            // Controleer of we al een sessie hebben
-            const user = checkAuth();
-            
-            // Redirect naar juiste pagina
-            setTimeout(function() {
-                if (user) {
-                    // Doorverwijzen naar dashboard
-                    window.location.href = 'dashboard.html';
-                } else {
-                    // Doorverwijzen naar login
-                    window.location.href = 'login.html';
-                }
-            }, 1000); // Korte vertraging voor gebruikservaring
-        })();
+        }, 1000);
     </script>
 </body>
 </html>
