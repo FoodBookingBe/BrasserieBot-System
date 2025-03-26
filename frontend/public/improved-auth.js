@@ -1,9 +1,9 @@
 // Verbeterde authenticatie en gebruikersbeheer voor BrasserieBot Dashboard
 
-// Beveiligingsniveau verhoogd, maar nog steeds client-side demo
-// In een echte productie-omgeving zou alle authenticatie via een beveiligde backend moeten verlopen
+// Beveiligingsniveau verhoogd, met integratie van backend API
+// Bevat fallback naar client-side demo wanneer API niet beschikbaar is
 
-// Gebruikersdatabase (alleen voor demo)
+// Gebruikersdatabase (alleen voor demo/fallback)
 // Wachtwoorden zijn gehashed (SHA-256) - in productie zou je bcrypt of Argon2 gebruiken
 const userDatabase = {
     "admin": {
@@ -28,41 +28,79 @@ async function hashPassword(password) {
     return hashHex;
 }
 
-// Authenticatie functie
+// Authenticatie functie die API gebruikt wanneer beschikbaar, met fallback naar lokale authenticatie
 async function authenticate(username, password) {
-    // Controleer of gebruiker bestaat
-    const user = userDatabase[username];
-    if (!user) {
-        return null; // Gebruiker niet gevonden
+    try {
+        // Controleer of de API client beschikbaar is
+        if (window.BrasserieBotAPI && window.BrasserieBotAPI.auth) {
+            console.log("Authenticatie via API");
+            try {
+                // Gebruik de API om in te loggen
+                const user = await window.BrasserieBotAPI.auth.login(username, password);
+                
+                if (user) {
+                    // Sla gebruikersinformatie op
+                    localStorage.setItem('brasseriebot_user', JSON.stringify({
+                        username: username,
+                        role: user.role || 'USER',
+                        restaurantName: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Demo Restaurant',
+                        lastLogin: new Date().toISOString(),
+                    }));
+                    localStorage.setItem('brasseriebot_auth_time', Date.now());
+                    return user;
+                }
+                return null; // Authenticatie mislukt
+            } catch (apiError) {
+                console.warn("API authenticatie mislukt, terugvallen op lokale authenticatie:", apiError);
+                // Terugvallen op lokale authenticatie als API mislukt
+            }
+        } 
+        
+        console.log("Authenticatie via lokale database (fallback)");
+        // Fallback naar lokale authenticatie
+        // Controleer of gebruiker bestaat
+        const user = userDatabase[username];
+        if (!user) {
+            return null; // Gebruiker niet gevonden
+        }
+
+        // Hash het ingevoerde wachtwoord
+        const passwordHash = await hashPassword(password);
+        
+        // Vergelijk de hashes
+        if (passwordHash !== user.passwordHash) {
+            return null; // Wachtwoord komt niet overeen
+        }
+
+        // Gebruiker geauthenticeerd, maak een gebruikersobject
+        const authenticatedUser = {
+            username: username,
+            role: user.role,
+            restaurantName: user.restaurantName,
+            lastLogin: new Date().toISOString(),
+            // Een eenvoudige token genereren voor sessie validatie
+            token: btoa(username + ":" + Math.random().toString(36).substring(2) + ":" + Date.now())
+        };
+
+        // Sla gebruikersinformatie op
+        localStorage.setItem('brasseriebot_user', JSON.stringify(authenticatedUser));
+        localStorage.setItem('brasseriebot_auth_time', Date.now());
+        
+        return authenticatedUser;
+    } catch (error) {
+        console.error("Authenticatie fout:", error);
+        return null;
     }
-
-    // Hash het ingevoerde wachtwoord
-    const passwordHash = await hashPassword(password);
-    
-    // Vergelijk de hashes
-    if (passwordHash !== user.passwordHash) {
-        return null; // Wachtwoord komt niet overeen
-    }
-
-    // Gebruiker geauthenticeerd, maak een gebruikersobject
-    const authenticatedUser = {
-        username: username,
-        role: user.role,
-        restaurantName: user.restaurantName,
-        lastLogin: new Date().toISOString(),
-        // Een eenvoudige token genereren voor sessie validatie
-        token: btoa(username + ":" + Math.random().toString(36).substring(2) + ":" + Date.now())
-    };
-
-    // Sla gebruikersinformatie op
-    localStorage.setItem('brasseriebot_user', JSON.stringify(authenticatedUser));
-    localStorage.setItem('brasseriebot_auth_time', Date.now());
-    
-    return authenticatedUser;
 }
 
 // Check of gebruiker is ingelogd
 function checkAuth() {
+    // Eerst proberen via API indien beschikbaar
+    if (window.BrasserieBotAPI && window.BrasserieBotAPI.auth && window.BrasserieBotAPI.auth.isAuthenticated()) {
+        return getUserInfo();
+    }
+    
+    // Anders lokale controle
     const user = getUserInfo();
     
     // Als geen gebruiker gevonden, redirecten naar login
@@ -83,6 +121,22 @@ function checkAuth() {
 
 // Gebruikersinformatie ophalen
 function getUserInfo() {
+    // Probeer eerst via API indien beschikbaar
+    if (window.BrasserieBotAPI && window.BrasserieBotAPI.auth && window.BrasserieBotAPI.auth.isAuthenticated()) {
+        try {
+            // Start een async call voor het bijwerken van gebruikersprofiel (doen we in de achtergrond)
+            window.BrasserieBotAPI.auth.getProfile().then(profileData => {
+                // Update lokale cache met nieuwe profielgegevens
+                const currentUser = JSON.parse(localStorage.getItem('brasseriebot_user') || '{}');
+                const updatedUser = { ...currentUser, ...profileData };
+                localStorage.setItem('brasseriebot_user', JSON.stringify(updatedUser));
+            }).catch(err => console.warn('Fout bij ophalen profielgegevens:', err));
+        } catch (e) {
+            console.warn('API getUserInfo error:', e);
+        }
+    }
+    
+    // Haal op uit localStorage (dit retourneert altijd iets, zelfs als de async call nog bezig is)
     const userJson = localStorage.getItem('brasseriebot_user');
     if (!userJson) {
         return null;
@@ -121,11 +175,11 @@ function updateUIForUser(user) {
     
     const userEmail = document.querySelector('.user-email');
     if (userEmail) {
-        userEmail.textContent = user.username + '@brasseriebot.com';
+        userEmail.textContent = user.email || user.username + '@brasseriebot.com';
     }
     
     // UI aanpassen op basis van gebruikersrol
-    if (user.role === 'admin') {
+    if (user.role === 'admin' || user.role === 'ADMIN') {
         // Alle admin functies tonen
         document.querySelectorAll('[data-role="admin"]').forEach(el => {
             el.style.display = 'block';
@@ -140,6 +194,16 @@ function updateUIForUser(user) {
 
 // Uitloggen
 function logout() {
+    // API uitloggen indien beschikbaar
+    if (window.BrasserieBotAPI && window.BrasserieBotAPI.auth) {
+        try {
+            window.BrasserieBotAPI.auth.logout();
+        } catch (e) {
+            console.warn('API logout error:', e);
+        }
+    }
+    
+    // Altijd lokaal uitloggen
     localStorage.removeItem('brasseriebot_user');
     localStorage.removeItem('brasseriebot_auth_time');
     window.location.href = 'login.html';
