@@ -6,12 +6,36 @@ const mainContent = document.querySelector('.main-content');
 const navLinks = document.querySelectorAll('.sidebar-nav a');
 const contentSections = document.querySelectorAll('.content');
 const tabButtons = document.querySelectorAll('.tab');
+const menuToggle = document.getElementById('menu-toggle');
+const searchToggle = document.getElementById('search-toggle');
+const searchContainer = document.querySelector('.search-container');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
 // Tab contents are selected dynamically in the switchTab function
 
 // Show/hide sidebar (mobile)
 function toggleSidebar() {
-    sidebar.classList.toggle('collapsed');
-    mainContent.classList.toggle('expanded');
+    // For mobile devices
+    if (window.innerWidth <= 991) {
+        sidebar.classList.toggle('mobile-active');
+        sidebarOverlay.classList.toggle('active');
+        document.body.classList.toggle('sidebar-open');
+    } else {
+        // For desktop (old behavior)
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    }
+}
+
+// Toggle mobile search
+function toggleMobileSearch() {
+    searchContainer.classList.toggle('mobile-expanded');
+}
+
+// Close sidebar when clicking outside
+function closeSidebar() {
+    sidebar.classList.remove('mobile-active');
+    sidebarOverlay.classList.remove('active');
+    document.body.classList.remove('sidebar-open');
 }
 
 // Switch between pages
@@ -100,6 +124,42 @@ document.addEventListener('DOMContentLoaded', () => {
         showPage(hash);
     }
     
+    // Setup mobile menu toggle
+    if (menuToggle) {
+        menuToggle.addEventListener('click', toggleSidebar);
+    }
+    
+    // Setup mobile search toggle
+    if (searchToggle) {
+        searchToggle.addEventListener('click', toggleMobileSearch);
+    }
+    
+    // Setup sidebar overlay click handler
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeSidebar);
+    }
+    
+    // Add mobile-specific behavior for nav links
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            // Close sidebar on mobile when navigating
+            if (window.innerWidth <= 991) {
+                closeSidebar();
+            }
+        });
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 991) {
+            // Close mobile sidebar and reset when returning to desktop
+            sidebar.classList.remove('mobile-active');
+            sidebarOverlay.classList.remove('active');
+            document.body.classList.remove('sidebar-open');
+            searchContainer.classList.remove('mobile-expanded');
+        }
+    });
+    
     // Setup reservations module if it exists
     if (window.BrasserieBotReservations) {
         // Will be initialized when the reservations page is shown
@@ -110,3 +170,5 @@ document.addEventListener('DOMContentLoaded', () => {
 window.showPage = showPage;
 window.switchTab = switchTab;
 window.toggleSidebar = toggleSidebar;
+window.toggleMobileSearch = toggleMobileSearch;
+window.closeSidebar = closeSidebar;

@@ -1,0 +1,232 @@
+/* BrasserieBot Responsive Styles for Mobile Devices */
+
+/* Base Mobile-friendly settings */
+@media screen and (max-width: 991px) {
+    :root {
+        --sidebar-width: 260px;
+    }
+
+    /* Dashboard container */
+    .dashboard-container {
+        display: block;
+    }
+
+    /* Sidebar - hide by default on mobile */
+    .sidebar {
+        width: var(--sidebar-width);
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    /* Show sidebar when active */
+    .sidebar.mobile-active {
+        transform: translateX(0);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Sidebar overlay */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    /* Main content - full width */
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* Header mobile styles */
+    .header {
+        padding: 0 16px;
+    }
+
+    /* Add menu toggle button */
+    .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        width: 36px;
+        height: 36px;
+        color: var(--text-muted);
+        cursor: pointer;
+        margin-right: 12px;
+    }
+
+    /* Hide search on mobile by default */
+    .search-container {
+        display: none;
+    }
+
+    /* Show in expanded mode */
+    .search-container.mobile-expanded {
+        display: block;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        padding: 10px 16px;
+        background-color: var(--card-background);
+        border-bottom: 1px solid var(--border-color);
+        z-index: 5;
+    }
+
+    /* Search button for mobile */
+    .search-toggle {
+        display: flex;
+        background: none;
+        border: none;
+        width: 36px;
+        height: 36px;
+        color: var(--text-muted);
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* User profile on mobile */
+    .user-info {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    /* Stats grid - stack on mobile */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    /* Insights grid - stack on mobile */
+    .insights-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .insights-card, .quick-actions-card {
+        width: 100%;
+        margin-bottom: 16px;
+    }
+
+    /* Table overflows - make scrollable */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Responsive tabs */
+    .tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        display: flex;
+        padding-bottom: 5px;
+    }
+
+    .tab {
+        flex: 0 0 auto;
+    }
+
+    /* Form layouts */
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .form-actions button {
+        width: 100%;
+    }
+
+    /* Card padding on mobile */
+    .card {
+        padding: 16px;
+    }
+
+    /* Page header stacking */
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .page-header button {
+        align-self: stretch;
+    }
+
+    /* History items */
+    .history-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    /* Tables on mobile */
+    .data-table {
+        min-width: 650px; /* Ensure the table is scrollable */
+    }
+}
+
+/* Very small devices (phones) */
+@media screen and (max-width: 575px) {
+    /* Further adjustments for very small screens */
+    
+    /* Header elements */
+    .header-actions {
+        gap: 8px;
+    }
+    
+    .divider {
+        display: none;
+    }
+    
+    /* Content padding */
+    .content {
+        padding: 16px;
+    }
+    
+    /* Filter actions */
+    .filter-actions {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .filter-actions select,
+    .filter-actions button {
+        width: 100%;
+    }
+    
+    /* Adjust buttons */
+    .quick-action-btn {
+        padding: 12px;
+    }
+    
+    /* Login container adjustments */
+    .login-container {
+        padding: 24px;
+    }
+}

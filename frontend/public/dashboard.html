@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BrasserieBot Dashboard</title>
-    <link rel="stylesheet" href="styles-combined.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="responsive.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.363.0/dist/umd/lucide.min.css">
@@ -129,7 +129,7 @@
                     <button class="search-toggle" id="search-toggle" aria-label="Zoeken">
                         <i data-lucide="search"></i>
                     </button>
-                    <button class="notification-btn" aria-label="Notificaties">
+                    <button class="notification-btn">
                         <i data-lucide="bell"></i>
                         <span class="notification-badge"></span>
                     </button>
@@ -328,10 +328,10 @@
                                         <td>156</td>
                                         <td>2025-03-25</td>
                                         <td class="actions-cell">
-                                            <button class="icon-btn primary" aria-label="Bewerk reservations tabel">
+                                            <button class="icon-btn primary">
                                                 <i data-lucide="edit"></i>
                                             </button>
-                                            <button class="icon-btn danger" aria-label="Verwijder reservations tabel">
+                                            <button class="icon-btn danger">
                                                 <i data-lucide="trash-2"></i>
                                             </button>
                                         </td>
@@ -346,10 +346,10 @@
                                         <td>342</td>
                                         <td>2025-03-24</td>
                                         <td class="actions-cell">
-                                            <button class="icon-btn primary" aria-label="Bewerk customers tabel">
+                                            <button class="icon-btn primary">
                                                 <i data-lucide="edit"></i>
                                             </button>
-                                            <button class="icon-btn danger" aria-label="Verwijder customers tabel">
+                                            <button class="icon-btn danger">
                                                 <i data-lucide="trash-2"></i>
                                             </button>
                                         </td>
@@ -364,10 +364,10 @@
                                         <td>78</td>
                                         <td>2025-03-20</td>
                                         <td class="actions-cell">
-                                            <button class="icon-btn primary" aria-label="Bewerk menu_items tabel">
+                                            <button class="icon-btn primary">
                                                 <i data-lucide="edit"></i>
                                             </button>
-                                            <button class="icon-btn danger" aria-label="Verwijder menu_items tabel">
+                                            <button class="icon-btn danger">
                                                 <i data-lucide="trash-2"></i>
                                             </button>
                                         </td>
@@ -407,8 +407,7 @@
                             <h3>Database herstellen</h3>
                             <p>Herstel uw database vanuit een eerder gemaakte backup</p>
                             <div class="file-upload-container">
-                                <label for="backup-file">Selecteer backup bestand</label>
-                                <input type="file" id="backup-file" class="file-input" aria-label="Selecteer backup bestand">
+                                <input type="file" class="file-input">
                                 <button class="secondary-btn">Herstellen</button>
                             </div>
                         </div>
@@ -481,8 +480,7 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
                                 <input type="text" class="search-input" placeholder="Zoek in geschiedenis...">
                             </div>
                             <div class="filter-actions">
-                                <label for="category-filter" class="sr-only">Filter op categorie</label>
-                                <select id="category-filter" class="input-field small" aria-label="Filter op categorie">
+                                <select class="input-field small">
                                     <option>Alle categorieën</option>
                                     <option>Ontwikkeling</option>
                                     <option>Domeinkennis</option>
@@ -500,10 +498,10 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
                                         <p>25 maart 2025, 14:32</p>
                                     </div>
                                     <div class="history-actions">
-                                        <button class="icon-btn primary" aria-label="Bewerk prompt">
+                                        <button class="icon-btn primary">
                                             <i data-lucide="edit"></i>
                                         </button>
-                                        <button class="icon-btn" aria-label="Voer prompt opnieuw uit">
+                                        <button class="icon-btn">
                                             <i data-lucide="play"></i>
                                         </button>
                                     </div>
@@ -526,10 +524,10 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
                                         <p>24 maart 2025, 09:15</p>
                                     </div>
                                     <div class="history-actions">
-                                        <button class="icon-btn primary" aria-label="Bewerk prompt">
+                                        <button class="icon-btn primary">
                                             <i data-lucide="edit"></i>
                                         </button>
-                                        <button class="icon-btn" aria-label="Voer prompt opnieuw uit">
+                                        <button class="icon-btn">
                                             <i data-lucide="play"></i>
                                         </button>
                                     </div>
