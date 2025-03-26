@@ -1,15 +1,11 @@
-# Netlify _redirects bestand voor foodbookingai.netlify.app
-# Deze regels worden altijd toegepast, zelfs als er conflicten zijn met netlify.toml
+# Netlify redirects voor BrasserieBot
+# Deze file zorgt ervoor dat alle routes correct worden afgehandeld
 
+# Redirect van index naar login
+/ /login.html 302
 
-# API proxy voor CORS problemen
-/api/* https://brasserie-bot-api.onrender.com/:splat 200
+# Redirect van dashboard-fixed naar nieuwe dashboard
+/dashboard-fixed.html /dashboard.html 301
 
-# SPA fallback - alle routes naar index.html voor client-side routing
+# SPA fallback - alle onbekende routes naar index.html
 /* /index.html 200
-
-# Extra veiligheid - blokkeer toegang tot bepaalde bestanden
-/.env* /404.html 404
-/.git* /404.html 404
-/.github* /404.html 404
-/node_modules/* /404.html 404

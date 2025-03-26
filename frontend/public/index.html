@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0;url=dashboard-fixed.html">
+    <meta http-equiv="refresh" content="0;url=login.html">
     <title>BrasserieBot Dashboard</title>
     <style>
         body {
@@ -44,12 +44,18 @@
 </head>
 <body>
     <h1>BrasserieBot Dashboard</h1>
-    <p>U wordt doorgestuurd naar het dashboard...</p>
-    <a href="dashboard-fixed.html" class="btn">Klik hier als u niet automatisch wordt doorgestuurd</a>
+    <p>U wordt doorgestuurd naar de inlogpagina...</p>
+    <a href="login.html" class="btn">Klik hier als u niet automatisch wordt doorgestuurd</a>
     
     <script>
-        // Redirect to dashboard
-        window.location.href = 'dashboard-fixed.html';
+        // Controleer of we al een sessie hebben
+        if (localStorage.getItem('brasseriebot_user')) {
+            // Doorverwijzen naar dashboard
+            window.location.href = 'dashboard.html';
+        } else {
+            // Doorverwijzen naar login
+            window.location.href = 'login.html';
+        }
     </script>
 </body>
 </html>
