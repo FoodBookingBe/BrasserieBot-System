@@ -7,7 +7,7 @@
 # Redirects for direct access to dashboard
 [[redirects]]
   from = "/"
-  to = "/dashboard-final.html"
+  to = "/dashboard-fixed.html"
   status = 302
   force = true
 
