@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 const Footer: React.FC = () => {
   return (
@@ -31,11 +32,16 @@ const Footer: React.FC = () => {
               rel="noopener noreferrer"
               className="inline-block"
             >
-              <img 
-                src="https://api.netlify.com/api/v1/badges/54f0d686-505e-42c9-a1e4-bd88412d859c/deploy-status" 
-                alt="Netlify Status" 
-                className="h-6"
-              />
+              {/* Vervang img met Next.js Image component */}
+              <div style={{ position: 'relative', width: '90px', height: '20px' }}>
+                <Image 
+                  src="https://api.netlify.com/api/v1/badges/54f0d686-505e-42c9-a1e4-bd88412d859c/deploy-status"
+                  alt="Netlify Status"
+                  fill
+                  style={{ objectFit: 'contain' }}
+                  unoptimized={true} // Noodzakelijk voor externe afbeeldingen
+                />
+              </div>
             </a>
             <p className="text-xs text-gray-500 mt-2">
               ©{new Date().getFullYear()} BrasserieBot System | Powered by Netlify

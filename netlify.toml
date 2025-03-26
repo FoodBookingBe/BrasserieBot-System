@@ -19,6 +19,7 @@
 # Netlify Functions configuratie (serverless)
 [functions]
   directory = "netlify/functions"
+  included_files = ["netlify/functions/**"]
   node_bundler = "esbuild"
 
 # Cache headers voor betere performance
