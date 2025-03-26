@@ -1,87 +1,20 @@
+# Deze configuratie wordt overschreven door de root netlify.toml
+
 [build]
   command = "npm run build"
   publish = ".next"
-  base = ""  # Zorg dat dit leeg is als je deployt vanuit een monorepo subfolder
 
 [build.environment]
   NODE_VERSION = "18"
   NEXT_PUBLIC_API_URL = "https://brasserie-bot-api.onrender.com"
-  # Turbopack optimalisatie
-  TURBO_FORCE = "true"
 
-# Belangrijke Next.js plugin voor betere integratie
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-# Performance optimalisaties
-[[plugins]]
-  package = "netlify-plugin-cache-nextjs"
-
-# Lighthouse performance test na build
-[[plugins]]
-  package = "netlify-plugin-lighthouse"
-  [plugins.inputs]
-    output_path = "lighthouse-report.html"
-
-# Automatische Image Optimalisatie
-[[plugins]]
-  package = "netlify-plugin-submit-sitemap"
-  [plugins.inputs]
-    baseUrl = "https://foodbookingai.netlify.app"
-    sitemapPath = "/sitemap.xml"
-
-# Optimaliseer assets
-[[plugins]]
-  package = "netlify-plugin-inline-critical-css"
-
-# Gzip compression
-[[plugins]]
-  package = "netlify-plugin-compression"
-  [plugins.inputs]
-    extensions = ["html", "js", "css", "svg", "json"]
-
-# Headers voor betere veiligheid en caching
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://brasserie-bot-api.onrender.com; connect-src 'self' https://brasserie-bot-api.onrender.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline';"
-    
-# Cache control voor statische assets
-[[headers]]
-  for = "/_next/static/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/static/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Redirects voor client-side routing
-[[redirects]]
-  from = "/*"
-  to = "/_next/static/:splat"
-  status = 200
-  force = false
-  condition = { path = { matches = "^/_next/static/.*" } }
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-# Netlify Functions configuratie (serverless)
 [functions]
   directory = "netlify/functions"
-  node_bundler = "esbuild"
-
-# Development configuratie
-[dev]
-  command = "npm run dev"
-  port = 8888
-  targetPort = 3000
-  framework = "next"
