@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrasserieBot Dashboard</title>
+    <link rel="stylesheet" href="styles-combined.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.363.0/dist/umd/lucide.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">BrasserieBot</h1>
+                <p class="sidebar-subtitle">Dashboard</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="#dashboard">
+                            <span class="icon"><i data-lucide="layout-dashboard"></i></span>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#reservations">
+                            <span class="icon"><i data-lucide="calendar-clock"></i></span>
+                            Reservatiebeheer
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#inventory">
+                            <span class="icon"><i data-lucide="shopping-cart"></i></span>
+                            Voorraad & Inkoop
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#staff">
+                            <span class="icon"><i data-lucide="users"></i></span>
+                            Personeelsplanning
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#menu">
+                            <span class="icon"><i data-lucide="menu"></i></span>
+                            Menu & Prijzen
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#customers">
+                            <span class="icon"><i data-lucide="user-circle"></i></span>
+                            Klanten & Loyaliteit
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#analytics">
+                            <span class="icon"><i data-lucide="bar-chart"></i></span>
+                            AI Analytics
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#payments">
+                            <span class="icon"><i data-lucide="credit-card"></i></span>
+                            Betalingen & Leveranciers
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#marketing">
+                            <span class="icon"><i data-lucide="message-square"></i></span>
+                            Marketing & Promoties
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#database">
+                            <span class="icon"><i data-lucide="database"></i></span>
+                            Database Beheer
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#prompts">
+                            <span class="icon"><i data-lucide="terminal"></i></span>
+                            Prompts Beheer
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#settings">
+                            <span class="icon"><i data-lucide="settings"></i></span>
+                            Instellingen
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span>BB</span>
+                    </div>
+                    <div class="user-details">
+                        <p class="user-name">BrasserieBot Admin</p>
+                        <p class="user-email">admin@brasseriebot.com</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="search-container">
+                    <span class="search-icon"><i data-lucide="search"></i></span>
+                    <input type="text" class="search-input" placeholder="Zoeken...">
+                </div>
+                
+                <div class="header-actions">
+                    <button class="notification-btn" aria-label="Notificaties">
+                        <i data-lucide="bell"></i>
+                        <span class="notification-badge"></span>
+                    </button>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="welcome-text">
+                        <span>Welkom terug</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="content" id="dashboard-content">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard Overzicht</h1>
+                    <button class="primary-btn">
+                        <span>Rapport genereren</span>
+                        <i data-lucide="arrow-up-right"></i>
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <p class="stat-label">Reserveringen vandaag</p>
+                                <p class="stat-value">24</p>
+                            </div>
+                            <div class="stat-icon blue">
+                                <i data-lucide="calendar"></i>
+                            </div>
+                        </div>
+                        <div class="stat-footer">
+                            <span class="positive">+12% </span>
+                            <span class="stat-comparison">t.o.v. vorige week</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <p class="stat-label">Omzet vandaag</p>
+                                <p class="stat-value">€1,254</p>
+                            </div>
+                            <div class="stat-icon green">
+                                <i data-lucide="bar-chart-3"></i>
+                            </div>
+                        </div>
+                        <div class="stat-footer">
+                            <span class="positive">+8% </span>
+                            <span class="stat-comparison">t.o.v. vorige week</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <p class="stat-label">Klanten vandaag</p>
+                                <p class="stat-value">86</p>
+                            </div>
+                            <div class="stat-icon purple">
+                                <i data-lucide="users"></i>
+                            </div>
+                        </div>
+                        <div class="stat-footer">
+                            <span class="positive">+5% </span>
+                            <span class="stat-comparison">t.o.v. vorige week</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <p class="stat-label">Voorraad items laag</p>
+                                <p class="stat-value">7</p>
+                            </div>
+                            <div class="stat-icon red">
+                                <i data-lucide="shopping-cart"></i>
+                            </div>
+                        </div>
+                        <div class="stat-footer">
+                            <span class="negative">Actie vereist </span>
+                            <span class="stat-comparison">Bekijk voorraad</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="insights-grid">
+                    <div class="insights-card">
+                        <div class="card-header">
+                            <h2 class="card-title">AI Inzichten</h2>
+                            <button class="outline-btn">Alle inzichten</button>
+                        </div>
+                        <div class="insights-list">
+                            <div class="insight blue">
+                                <div class="insight-avatar">
+                                    <span>AI</span>
+                                </div>
+                                <div class="insight-content">
+                                    <h3 class="insight-title">Voorbereid op drukke vrijdag</h3>
+                                    <p class="insight-text">
+                                        Op basis van historische gegevens verwachten we 30% meer reserveringen komende vrijdag. 
+                                        Overweeg extra personeel in te plannen tussen 18:00 en 21:00.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="insight green">
+                                <div class="insight-avatar">
+                                    <span>AI</span>
+                                </div>
+                                <div class="insight-content">
+                                    <h3 class="insight-title">Menu-optimalisatie</h3>
+                                    <p class="insight-text">
+                                        De nieuwe seizoensgerechten presteren 15% beter dan verwacht. 
+                                        Overweeg om de voorraad voor deze items te verhogen.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Snelle acties</h2>
+                        </div>
+                        <div class="quick-actions-list">
+                            <button class="quick-action-btn" onclick="showPage('database')">
+                                <p class="action-title">Database beheren</p>
+                                <p class="action-desc">Voeg gegevens toe of bewerk bestaande records</p>
+                            </button>
+                            <button class="quick-action-btn" onclick="showPage('prompts')">
+                                <p class="action-title">Prompts beheren</p>
+                                <p class="action-desc">Pas AI-prompts aan voor verschillende modules</p>
+                            </button>
+                            <button class="quick-action-btn" onclick="showPage('reservations')">
+                                <p class="action-title">Reservering toevoegen</p>
+                                <p class="action-desc">Voeg snel een nieuwe reservering toe</p>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Database Page -->
+            <main class="content hidden" id="database-content">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Database Beheer</h1>
+                        <p class="page-subtitle">Beheer uw BrasserieBot database tabellen en records</p>
+                    </div>
+                    <button class="primary-btn">
+                        <i data-lucide="plus"></i>
+                        <span>Nieuwe tabel</span>
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="tabs">
+                        <button class="tab active" data-tab="tables">Tabellen</button>
+                        <button class="tab" data-tab="records">Records</button>
+                        <button class="tab" data-tab="queries">Queries</button>
+                        <button class="tab" data-tab="backup">Backup & Restore</button>
+                    </div>
+
+                    <div class="tab-content active" id="tables-content">
+                        <div class="table-actions">
+                            <div class="search-container small">
+                                <span class="search-icon"><i data-lucide="search"></i></span>
+                                <input type="text" class="search-input" placeholder="Zoek tabellen...">
+                            </div>
+                            <button class="outline-btn">
+                                <i data-lucide="filter"></i>
+                                <span>Filter</span>
+                            </button>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Naam</th>
+                                        <th>Records</th>
+                                        <th>Laatst bijgewerkt</th>
+                                        <th class="actions-column">Acties</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="table-cell-with-icon">
+                                                <i data-lucide="database"></i>
+                                                <span>reservations</span>
+                                            </div>
+                                        </td>
+                                        <td>156</td>
+                                        <td>2025-03-25</td>
+                                        <td class="actions-cell">
+                                            <button class="icon-btn primary" aria-label="Bewerk reservations tabel">
+                                                <i data-lucide="edit"></i>
+                                            </button>
+                                            <button class="icon-btn danger" aria-label="Verwijder reservations tabel">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="table-cell-with-icon">
+                                                <i data-lucide="database"></i>
+                                                <span>customers</span>
+                                            </div>
+                                        </td>
+                                        <td>342</td>
+                                        <td>2025-03-24</td>
+                                        <td class="actions-cell">
+                                            <button class="icon-btn primary" aria-label="Bewerk customers tabel">
+                                                <i data-lucide="edit"></i>
+                                            </button>
+                                            <button class="icon-btn danger" aria-label="Verwijder customers tabel">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="table-cell-with-icon">
+                                                <i data-lucide="database"></i>
+                                                <span>menu_items</span>
+                                            </div>
+                                        </td>
+                                        <td>78</td>
+                                        <td>2025-03-20</td>
+                                        <td class="actions-cell">
+                                            <button class="icon-btn primary" aria-label="Bewerk menu_items tabel">
+                                                <i data-lucide="edit"></i>
+                                            </button>
+                                            <button class="icon-btn danger" aria-label="Verwijder menu_items tabel">
+                                                <i data-lucide="trash-2"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="records-content">
+                        <div class="empty-state">
+                            <i data-lucide="database"></i>
+                            <h3>Selecteer een tabel</h3>
+                            <p>Selecteer eerst een tabel om records te bekijken en te bewerken</p>
+                            <button class="outline-btn">Tabel selecteren</button>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="queries-content">
+                        <div class="form-group">
+                            <label for="query">SQL Query</label>
+                            <textarea id="query" rows="5" class="input-field code" placeholder="SELECT * FROM table_name WHERE condition;"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button class="primary-btn">Query uitvoeren</button>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="backup-content">
+                        <div class="card-section">
+                            <h3>Database backup</h3>
+                            <p>Maak een volledige backup van uw BrasserieBot database</p>
+                            <button class="primary-btn">Backup maken</button>
+                        </div>
+                        
+                        <div class="card-section">
+                            <h3>Database herstellen</h3>
+                            <p>Herstel uw database vanuit een eerder gemaakte backup</p>
+                            <div class="file-upload-container">
+                                <label for="backup-file">Selecteer backup bestand</label>
+                                <input type="file" id="backup-file" class="file-input" aria-label="Selecteer backup bestand">
+                                <button class="secondary-btn">Herstellen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Prompts Page -->
+            <main class="content hidden" id="prompts-content">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">Prompts Beheer</h1>
+                        <p class="page-subtitle">Beheer en test uw AI-prompts voor BrasserieBot</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="tabs">
+                        <button class="tab active" data-tab="test">Prompt Testen</button>
+                        <button class="tab" data-tab="history">Prompt Geschiedenis</button>
+                        <button class="tab" data-tab="settings">AI Instellingen</button>
+                    </div>
+
+                    <div class="tab-content active" id="test-content">
+                        <div class="form-group">
+                            <label for="prompt-template">Selecteer template of maak een nieuwe</label>
+                            <select id="prompt-template" class="input-field">
+                                <option value="">Selecteer een template of maak een nieuwe...</option>
+                                <option value="1">Feature Planning - Ontwikkeling</option>
+                                <option value="2">Horeca Processen - Domeinkennis</option>
+                                <option value="3">UI/UX Design - Creatieve Input</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="prompt-input">Prompt tekst</label>
+                            <textarea id="prompt-input" rows="8" class="input-field code" placeholder="Voer hier uw prompt in...">Ik wil een nieuwe feature toevoegen aan BrasserieBot:
+
+[GEDETAILLEERDE BESCHRIJVING VAN DE FEATURE]
+
+Deze feature heeft prioriteit [HOOG/MEDIUM/LAAG] en moet de volgende bedrijfsdoelen ondersteunen:
+[BESCHRIJF BEDRIJFSDOELEN]
+
+Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en bereid een gedetailleerd ontwikkelplan voor.</textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button class="outline-btn">
+                                <i data-lucide="save"></i>
+                                <span>Opslaan als template</span>
+                            </button>
+                            <button class="primary-btn" id="execute-prompt-btn">
+                                <i data-lucide="play"></i>
+                                <span>Uitvoeren</span>
+                            </button>
+                        </div>
+                        
+                        <div class="result-section">
+                            <h3>Resultaat</h3>
+                            <div class="result-container" id="prompt-result">
+                                <p class="placeholder-text">Voer een prompt uit om resultaten te zien...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="history-content">
+                        <div class="table-actions">
+                            <div class="search-container small">
+                                <span class="search-icon"><i data-lucide="search"></i></span>
+                                <input type="text" class="search-input" placeholder="Zoek in geschiedenis...">
+                            </div>
+                            <div class="filter-actions">
+                                <label for="category-filter" class="sr-only">Filter op categorie</label>
+                                <select id="category-filter" class="input-field small" aria-label="Filter op categorie">
+                                    <option>Alle categorieën</option>
+                                    <option>Ontwikkeling</option>
+                                    <option>Domeinkennis</option>
+                                    <option>Creatieve Input</option>
+                                </select>
+                                <button class="outline-btn">Exporteren</button>
+                            </div>
+                        </div>
+                        
+                        <div class="history-list">
+                            <div class="history-item">
+                                <div class="history-header">
+                                    <div>
+                                        <h3>Feature Planning: Menu Optimalisatie</h3>
+                                        <p>25 maart 2025, 14:32</p>
+                                    </div>
+                                    <div class="history-actions">
+                                        <button class="icon-btn primary" aria-label="Bewerk prompt">
+                                            <i data-lucide="edit"></i>
+                                        </button>
+                                        <button class="icon-btn" aria-label="Voer prompt opnieuw uit">
+                                            <i data-lucide="play"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="history-content">
+                                    <p class="history-label">Input:</p>
+                                    <p class="history-text">Plan de ontwikkeling van een menu optimalisatie feature voor BrasserieBot...</p>
+                                </div>
+                                <div class="history-content">
+                                    <p class="history-label">Output:</p>
+                                    <p class="history-text">Hier is een gedetailleerd ontwikkelplan voor de menu optimalisatie feature...</p>
+                                </div>
+                                <button class="text-btn">Toon volledig resultaat</button>
+                            </div>
+                            
+                            <div class="history-item">
+                                <div class="history-header">
+                                    <div>
+                                        <h3>Voortgangsrapport: Week 12</h3>
+                                        <p>24 maart 2025, 09:15</p>
+                                    </div>
+                                    <div class="history-actions">
+                                        <button class="icon-btn primary" aria-label="Bewerk prompt">
+                                            <i data-lucide="edit"></i>
+                                        </button>
+                                        <button class="icon-btn" aria-label="Voer prompt opnieuw uit">
+                                            <i data-lucide="play"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="history-content">
+                                    <p class="history-label">Input:</p>
+                                    <p class="history-text">Genereer een voortgangsrapport voor week 12 van het BrasserieBot project...</p>
+                                </div>
+                                <div class="history-content">
+                                    <p class="history-label">Output:</p>
+                                    <p class="history-text">Hier is het voortgangsrapport voor week 12 van het BrasserieBot project...</p>
+                                </div>
+                                <button class="text-btn">Toon volledig resultaat</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="settings-content">
+                        <div class="card-section">
+                            <h3>AI Model Instellingen</h3>
+                            <p>Configureer het AI-model dat wordt gebruikt voor prompts</p>
+                            
+                            <div class="form-group">
+                                <label for="ai-model">AI Model</label>
+                                <select id="ai-model" class="input-field">
+                                    <option value="claude-3-7">Claude 3.7 (Aanbevolen)</option>
+                                    <option value="claude-3-5">Claude 3.5</option>
+                                    <option value="gpt-4o">GPT-4o</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="temperature">Temperature (0.0 - 1.0)</label>
+                                <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.7" class="range-input">
+                                <div class="range-labels">
+                                    <span>Precies (0.0)</span>
+                                    <span>Gebalanceerd (0.5)</span>
+                                    <span>Creatief (1.0)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="max-tokens">Maximum tokens</label>
+                                <input type="number" id="max-tokens" class="input-field" value="4000">
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button class="primary-btn">
+                                    <i data-lucide="cog"></i>
+                                    <span>Instellingen opslaan</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="card-section">
+                            <h3>API Configuratie</h3>
+                            <p>Configureer de API-sleutels voor toegang tot AI-diensten</p>
+                            
+                            <div class="form-group">
+                                <label for="api-key">Anthropic API Sleutel</label>
+                                <input type="password" id="api-key" class="input-field" placeholder="sk-ant-...">
+                            </div>
+                            
+                            <div class="form-group checkbox">
+                                <input type="checkbox" id="save-history" checked>
+                                <label for="save-history">Prompt geschiedenis opslaan</label>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button class="primary-btn">
+                                    <i data-lucide="cog"></i>
+                                    <span>API Configuratie opslaan</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
