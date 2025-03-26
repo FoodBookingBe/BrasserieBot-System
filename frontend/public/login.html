@@ -4,213 +4,320 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BrasserieBot Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles-combined.css">
-    <link rel="stylesheet" href="responsive.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.363.0/dist/umd/lucide.min.css">
     <style>
+        /* Inline essentiële stijlen voor snellere weergave */
         body {
             background-color: #f5f7fa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
-        
         .login-container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            padding: 40px;
             width: 100%;
             max-width: 400px;
-            padding: 40px;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .login-logo {
+        .logo {
             text-align: center;
             margin-bottom: 30px;
         }
-        
-        .login-logo h1 {
-            color: #0066cc;
-            font-size: 1.8rem;
-            margin-bottom: 5px;
-            font-family: 'Inter', sans-serif;
+        .logo img {
+            max-width: 180px;
         }
-        
-        .login-logo p {
-            color: #6c757d;
-            font-size: 0.9rem;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .login-form {
-            margin-top: 20px;
-        }
-        
         .form-group {
             margin-bottom: 20px;
         }
-        
-        .form-group label {
+        .form-label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            font-size: 0.9rem;
-            font-family: 'Inter', sans-serif;
+            color: #333;
         }
-        
-        .input-field {
+        .form-input {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            transition: border-color 0.3s;
-            font-family: 'Inter', sans-serif;
-            box-sizing: border-box;
-        }
-        
-        .input-field:focus {
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 15px;
             outline: none;
-            border-color: #0066cc;
+            transition: border 0.3s, box-shadow 0.3s;
         }
-        
-        .login-btn {
-            width: 100%;
-            padding: 12px;
+        .form-input:focus {
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        .primary-btn {
             background-color: #0066cc;
             color: white;
             border: none;
-            border-radius: 4px;
-            font-size: 0.9rem;
+            border-radius: 6px;
+            padding: 14px 20px;
+            font-size: 16px;
             font-weight: 500;
+            width: 100%;
             cursor: pointer;
             transition: background-color 0.3s;
-            font-family: 'Inter', sans-serif;
         }
-        
-        .login-btn:hover {
+        .primary-btn:hover {
             background-color: #0052a3;
         }
-        
-        .remember-me {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .remember-me input {
-            margin-right: 8px;
-        }
-        
-        .forgot-password {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .forgot-password a {
-            color: #0066cc;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-        
         .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 10px;
-            border-radius: 4px;
+            background-color: #fee2e2;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 6px;
             margin-bottom: 20px;
-            font-size: 0.85rem;
+            font-size: 14px;
             display: none;
-            font-family: 'Inter', sans-serif;
         }
-        
         .error-message.show {
             display: block;
+        }
+        .login-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        /* Mobile responsiveness */
+        @media (max-width: 500px) {
+            .login-container {
+                max-width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+                padding: 20px;
+            }
+            body {
+                background-color: #ffffff;
+            }
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <div class="login-logo">
-            <h1>BrasserieBot</h1>
-            <p>Restaurant Management Dashboard</p>
+        <div class="logo">
+            <img src="https://placehold.co/180x60/0066cc/white?text=BrasserieBot" alt="BrasserieBot Logo">
         </div>
         
-        <div class="error-message" id="error-message">
+        <div id="error-message" class="error-message">
             Ongeldige gebruikersnaam of wachtwoord. Probeer het opnieuw.
         </div>
         
-        <form class="login-form" id="login-form">
+        <form id="login-form">
             <div class="form-group">
-                <label for="username">Gebruikersnaam</label>
-                <input type="text" id="username" name="username" class="input-field" placeholder="Voer uw gebruikersnaam in" required value="admin">
+                <label for="username" class="form-label">Gebruikersnaam</label>
+                <input type="text" id="username" class="form-input" placeholder="Uw gebruikersnaam" required>
             </div>
             
             <div class="form-group">
-                <label for="password">Wachtwoord</label>
-                <input type="password" id="password" name="password" class="input-field" placeholder="Voer uw wachtwoord in" required autocomplete="current-password">
+                <label for="password" class="form-label">Wachtwoord</label>
+                <input type="password" id="password" class="form-input" placeholder="Uw wachtwoord" required>
             </div>
             
-            <div class="remember-me">
-                <input type="checkbox" id="remember-me" name="remember-me">
-                <label for="remember-me">Onthoud mij</label>
-            </div>
-            
-            <button type="submit" class="login-btn">Inloggen</button>
+            <button type="submit" class="primary-btn">
+                <span>Inloggen</span>
+            </button>
         </form>
         
-        <div class="forgot-password">
-            <a href="#">Wachtwoord vergeten?</a>
+        <div class="login-footer">
+            &copy; 2025 BrasserieBot - Alle rechten voorbehouden
         </div>
     </div>
     
-    <script src="fallback.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    
+    <script>
+        // Basisauthenticatie functionaliteit (fallback)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lokale gebruikers data voor authenticatie
+            const userDatabase = {
+                "admin": {
+                    passwordHash: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", // admin123
+                    role: "admin",
+                    restaurantName: "Demo Restaurant"
+                },
+                "user": {
+                    passwordHash: "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c", // user123
+                    role: "user", 
+                    restaurantName: "Test Brasserie"
+                }
+            };
+            
+            // Helper functie voor wachtwoord hashing
+            async function hashPassword(password) {
+                try {
+                    const encoder = new TextEncoder();
+                    const data = encoder.encode(password);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    return hashHex;
+                } catch (e) {
+                    console.error('Hash error:', e);
+                    // Eenvoudige fallback hash voor oudere browsers
+                    return String(password).split('').reduce((a, b) => {
+                        a = (a << 5) - a + b.charCodeAt(0);
+                        return a & a;
+                    }, 0).toString();
+                }
+            }
+            
+            // Eenvoudige authenticatie functie
+            async function authenticate(username, password) {
+                console.log('Login poging:', username);
+                
+                try {
+                    // Als de API client beschikbaar is, probeer die eerst
+                    if (window.BrasserieBotAPI && window.BrasserieBotAPI.auth) {
+                        try {
+                            const user = await window.BrasserieBotAPI.auth.login(username, password);
+                            if (user) {
+                                console.log('API login succesvol');
+                                localStorage.setItem('brasseriebot_user', JSON.stringify({
+                                    username: username,
+                                    role: user.role || 'USER',
+                                    restaurantName: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'Demo Restaurant',
+                                    lastLogin: new Date().toISOString(),
+                                }));
+                                localStorage.setItem('brasseriebot_auth_time', Date.now());
+                                return user;
+                            }
+                        } catch (apiError) {
+                            console.warn('API auth error:', apiError);
+                        }
+                    }
+                    
+                    // Fallback naar lokale authenticatie
+                    // Controleer admin gebruiker
+                    if (username === 'admin' && password === 'admin123') {
+                        const user = {
+                            username: 'admin',
+                            role: 'admin',
+                            restaurantName: 'Demo Restaurant',
+                            lastLogin: new Date().toISOString()
+                        };
+                        
+                        localStorage.setItem('brasseriebot_user', JSON.stringify(user));
+                        localStorage.setItem('brasseriebot_auth_time', Date.now());
+                        return user;
+                    }
+                    
+                    // Controleer standaard gebruiker
+                    if (username === 'user' && password === 'user123') {
+                        const user = {
+                            username: 'user',
+                            role: 'user',
+                            restaurantName: 'Test Brasserie',
+                            lastLogin: new Date().toISOString()
+                        };
+                        
+                        localStorage.setItem('brasseriebot_user', JSON.stringify(user));
+                        localStorage.setItem('brasseriebot_auth_time', Date.now());
+                        return user;
+                    }
+
+                    // Probeer hashing (meer werk maar veiliger)
+                    const passwordHash = await hashPassword(password);
+                    const user = userDatabase[username];
+                    
+                    if (user && passwordHash === user.passwordHash) {
+                        const authenticatedUser = {
+                            username: username,
+                            role: user.role,
+                            restaurantName: user.restaurantName,
+                            lastLogin: new Date().toISOString()
+                        };
+                        
+                        localStorage.setItem('brasseriebot_user', JSON.stringify(authenticatedUser));
+                        localStorage.setItem('brasseriebot_auth_time', Date.now());
+                        return authenticatedUser;
+                    }
+                    
+                    return null;
+                } catch (e) {
+                    console.error('Authenticatie fout:', e);
+                    return null;
+                }
+            }
+            
+            // Setup login formulier
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    const errorMessage = document.getElementById('error-message');
+                    
+                    // Toon even een laad-indicator
+                    const submitButton = loginForm.querySelector('button[type="submit"]');
+                    const originalButtonText = submitButton.innerHTML;
+                    submitButton.innerHTML = '<span>Bezig met inloggen...</span>';
+                    submitButton.disabled = true;
+                    
+                    try {
+                        const user = await authenticate(username, password);
+                        
+                        if (user) {
+                            // Redirect to dashboard
+                            window.location.href = 'dashboard.html';
+                        } else {
+                            // Show error message
+                            if (errorMessage) {
+                                errorMessage.classList.add('show');
+                            }
+                            
+                            // Clear password field
+                            if (document.getElementById('password')) {
+                                document.getElementById('password').value = '';
+                            }
+                            
+                            // Herstel button
+                            submitButton.innerHTML = originalButtonText;
+                            submitButton.disabled = false;
+                        }
+                    } catch (error) {
+                        console.error('Login error:', error);
+                        
+                        // Toon foutmelding
+                        if (errorMessage) {
+                            errorMessage.textContent = 'Er is een fout opgetreden bij het inloggen. Probeer het later opnieuw.';
+                            errorMessage.classList.add('show');
+                        }
+                        
+                        // Herstel button
+                        submitButton.innerHTML = originalButtonText;
+                        submitButton.disabled = false;
+                    }
+                });
+            }
+
+            // Initialize any Lucide icons
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        });
+    </script>
+
+    <!-- Externe scripts - alleen geladen als ze beschikbaar zijn -->
+    <script src="fallback.js"></script>
     <script src="auto-a11y.js"></script>
     <script src="api-client.js"></script>
     <script src="improved-auth.js"></script>
     <script src="accessibility.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Lucide icons
-            lucide.createIcons();
-            
-            // Get form elements
-            const loginForm = document.getElementById('login-form');
-            const errorMessage = document.getElementById('error-message');
-            
-            // Handle form submission
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                
-                // Verbeterde authenticatie met hashing
-                const user = await BrasserieBotAuth.authenticate(username, password);
-                
-                if (user) {
-                    // Redirect to dashboard
-                    window.location.href = 'dashboard.html';
-                } else {
-                    // Show error message
-                    errorMessage.classList.add('show');
-                    
-                    // Clear password field
-                    document.getElementById('password').value = '';
-                }
-            });
-        });
-    </script>
 </body>
 </html>
