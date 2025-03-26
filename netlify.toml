@@ -7,6 +7,8 @@
   NODE_VERSION = "18"
   NEXT_PUBLIC_API_URL = "https://brasserie-bot-api.onrender.com"
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
+  # Fix EACCES warnings
+  NPM_FLAGS = "--no-optional"
 
 # Redirects voor client-side routing
 [[redirects]]
@@ -18,3 +20,9 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# Cache headers voor betere performance
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

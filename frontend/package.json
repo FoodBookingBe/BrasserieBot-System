@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build && echo 'Next.js build completed. Output in out directory.'",
     "start": "next start",
     "lint": "next lint",
     "netlify:dev": "netlify dev",
-    "netlify:build": "netlify build",
+    "netlify:build": "NETLIFY_NEXT_PLUGIN_SKIP=true next build",
     "netlify:deploy": "netlify deploy --prod"
   },
   "dependencies": {
