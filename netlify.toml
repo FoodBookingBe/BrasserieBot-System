@@ -1,0 +1,23 @@
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NEXT_PUBLIC_API_URL = "https://brasserie-bot-api.onrender.com"
+
+# Belangrijke Next.js plugin voor betere integratie
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Redirects voor client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Netlify Functions configuratie (serverless)
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
