@@ -9,10 +9,12 @@
   NEXT_PUBLIC_API_URL = "https://brasserie-bot-api.onrender.com"
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
+# Deze redirect is nodig voor zowel de Next.js app als onze dashboard HTML
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
 
 [functions]
   directory = "netlify/functions"

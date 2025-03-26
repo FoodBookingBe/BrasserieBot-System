@@ -10,11 +10,12 @@
   # Fix EACCES warnings
   NPM_FLAGS = "--no-optional"
 
-# Redirects voor client-side routing
+# Redirects voor client-side routing - alleen nodig in productie, niet in development
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
 
 # Netlify Functions configuratie (serverless)
 [functions]
