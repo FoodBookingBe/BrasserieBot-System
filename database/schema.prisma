@@ -18,6 +18,8 @@ model User {
   restaurants   Restaurant[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+
+  @@index([email]) // Bestaande unique index
 }
 
 enum UserRole {
@@ -48,6 +50,9 @@ model Restaurant {
   reservations    Reservation[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@index([ownerId])
+  @@index([name])
 }
 
 // Menu model
@@ -60,6 +65,8 @@ model Menu {
   items           MenuItem[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@index([restaurantId])
 }
 
 // MenuItem model
@@ -73,6 +80,9 @@ model MenuItem {
   orderItems      OrderItem[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@index([menuId])
+  @@index([name])
 }
 
 // Supplier model
@@ -89,6 +99,9 @@ model Supplier {
   payments        SupplierPayment[]
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@index([restaurantId])
+  @@index([name])
 }
 
 // Product model
@@ -101,6 +114,9 @@ model Product {
   supplierId      Int
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@index([supplierId])
+  @@index([name])
 }
 
 // Order model
@@ -113,6 +129,10 @@ model Order {
   totalAmount     Float
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@index([restaurantId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 enum OrderStatus {
@@ -135,6 +155,9 @@ model OrderItem {
   price           Float
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@index([orderId])
+  @@index([menuItemId])
 }
 
 // Reservation model
@@ -150,6 +173,10 @@ model Reservation {
   status          ReservationStatus @default(CONFIRMED)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@index([restaurantId])
+  @@index([reservationDate])
+  @@index([status])
 }
 
 enum ReservationStatus {
@@ -170,6 +197,10 @@ model SupplierPayment {
   dueDate         DateTime
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  @@index([supplierId])
+  @@index([status])
+  @@index([dueDate])
 }
 
 enum PaymentStatus {
