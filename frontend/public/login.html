@@ -230,20 +230,32 @@
                         const { data, error } = await supabaseClient.auth.loginWithPassword(email, password);
                         
                         if (error) {
-                            // Toon foutmelding
-                            errorMessage.textContent = error.message || 'Ongeldige inloggegevens. Probeer het opnieuw.';
-                            errorMessage.classList.add('show');
-                            document.getElementById('password').value = '';
+                            // Als er een API key probleem is, probeer de fallback login
+                            if (error.message && error.message.includes('API key')) {
+                                console.warn("Supabase API key probleem, terugvallen op lokale authenticatie");
+                                tryFallbackLogin(username, password);
+                            } else {
+                                // Toon foutmelding
+                                errorMessage.textContent = error.message || 'Ongeldige inloggegevens. Probeer het opnieuw.';
+                                errorMessage.classList.add('show');
+                                document.getElementById('password').value = '';
+                            }
                         } else {
                             // Succes - doorsturen naar dashboard
                             window.location.href = 'dashboard.html';
                         }
                     } catch (err) {
                         console.error('Login fout:', err);
-                        errorMessage.textContent = 'Er is een fout opgetreden. Probeer het later opnieuw.';
-                        errorMessage.classList.add('show');
+                        // Probeer de fallback login als er een fout optreedt
+                        tryFallbackLogin(username, password);
                     }
                 } else {
+                    // Fallback login direct gebruiken
+                    tryFallbackLogin(username, password);
+                }
+                
+                // Fallback login functie
+                function tryFallbackLogin(username, password) {
                     // Fallback voor demo/ontwikkeling wanneer Supabase niet beschikbaar is
                     if ((username === 'admin' && password === 'admin123') ||
                         (username === 'user' && password === 'user123')) {
