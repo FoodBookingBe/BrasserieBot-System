@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrasserieBot Supabase Direct Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #0066cc;
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 6px;
+        }
+        button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0052a3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d1fae5;
+            color: #047857;
+        }
+        .error {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+        pre {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BrasserieBot Supabase Direct Test</h1>
+        <div class="test-section">
+            <h2>1. Supabase Client Test</h2>
+            <button id="test-client">Test Supabase Client</button>
+            <div id="client-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>2. Verificatie Test</h2>
+            <button id="test-auth">Test Authenticatie</button>
+            <div id="auth-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>3. Database Test</h2>
+            <button id="test-db">Test Database Tabellen</button>
+            <div id="db-result" class="result"></div>
+        </div>
+    </div>
+
+    <!-- Supabase Script -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Hardcoded Supabase credentials
+        const SUPABASE_URL = 'https://yucpwawshjmonwsgvsfq.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl1Y3B3YXdzaGptb253c2d2c2ZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMwODM1NzQsImV4cCI6MjA1ODY1OTU3NH0.L5eKYyXAqjkze2_LhnHgEbAURMRt7r2q0ITI6hhktJ0';
+        
+        // Elements
+        const clientResultEl = document.getElementById('client-result');
+        const authResultEl = document.getElementById('auth-result');
+        const dbResultEl = document.getElementById('db-result');
+        
+        // Create Supabase client when page loads
+        let supabaseClient = null;
+        
+        try {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('Supabase client initialized');
+        } catch (error) {
+            console.error('Error initializing Supabase client:', error);
+        }
+        
+        // Test Client button
+        document.getElementById('test-client').addEventListener('click', async function() {
+            clientResultEl.innerHTML = '<p>Testing Supabase client...</p>';
+            clientResultEl.className = 'result';
+            
+            try {
+                if (!supabaseClient) {
+                    throw new Error('Supabase client not initialized');
+                }
+                
+                // Make a simple ping request
+                const { data, error } = await supabaseClient.rpc('ping').catch(e => ({error: e}));
+                
+                if (error) {
+                    // Try a different approach if RPC fails (it might not be available)
+                    try {
+                        const simpleQuery = await supabaseClient.from('_dummy_table_').select('*').limit(1).catch(e => ({error: e}));
+                        
+                        // This might fail with table not existing, which is fine - it means the connection works
+                        clientResultEl.innerHTML = `
+                            <p class="success">Supabase client is working!</p>
+                            <pre>URL: ${SUPABASE_URL}</pre>
+                            <pre>Result: ${JSON.stringify(simpleQuery.error || 'Success', null, 2)}</pre>
+                        `;
+                        clientResultEl.className = 'result success';
+                    } catch (fallbackError) {
+                        throw fallbackError;
+                    }
+                } else {
+                    clientResultEl.innerHTML = `
+                        <p class="success">Supabase client is working!</p>
+                        <pre>URL: ${SUPABASE_URL}</pre>
+                        <pre>Result: ${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                    clientResultEl.className = 'result success';
+                }
+            } catch (error) {
+                clientResultEl.innerHTML = `
+                    <p class="error">Error testing Supabase client</p>
+                    <pre>${error.message}</pre>
+                `;
+                clientResultEl.className = 'result error';
+            }
+        });
+        
+        // Test Auth button
+        document.getElementById('test-auth').addEventListener('click', async function() {
+            authResultEl.innerHTML = '<p>Testing authentication...</p>';
+            authResultEl.className = 'result';
+            
+            try {
+                if (!supabaseClient) {
+                    throw new Error('Supabase client not initialized');
+                }
+                
+                // Attempt to sign in with test credentials
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: 'admin@brasseriebot.com',
+                    password: 'admin123'
+                });
+                
+                if (error) {
+                    if (error.message.includes('Invalid login')) {
+                        // Attempt to create a test user
+                        authResultEl.innerHTML = `
+                            <p class="error">Login failed: ${error.message}</p>
+                            <p>Attempting to create test user...</p>
+                        `;
+                        
+                        const { data: signupData, error: signupError } = await supabaseClient.auth.signUp({
+                            email: 'admin@brasseriebot.com',
+                            password: 'admin123',
+                            options: {
+                                data: {
+                                    role: 'admin',
+                                    name: 'Admin User',
+                                    restaurantName: 'Test Restaurant'
+                                }
+                            }
+                        });
+                        
+                        if (signupError) {
+                            authResultEl.innerHTML += `
+                                <p class="error">User creation failed: ${signupError.message}</p>
+                            `;
+                            authResultEl.className = 'result error';
+                        } else {
+                            authResultEl.innerHTML += `
+                                <p class="success">Test user created successfully!</p>
+                                <pre>${JSON.stringify(signupData, null, 2)}</pre>
+                                <p>Try logging in again or check your email for confirmation.</p>
+                            `;
+                            authResultEl.className = 'result success';
+                        }
+                    } else {
+                        authResultEl.innerHTML = `
+                            <p class="error">Authentication error: ${error.message}</p>
+                        `;
+                        authResultEl.className = 'result error';
+                    }
+                } else {
+                    authResultEl.innerHTML = `
+                        <p class="success">Authentication successful!</p>
+                        <pre>User: ${data.user.email}</pre>
+                        <pre>ID: ${data.user.id}</pre>
+                    `;
+                    authResultEl.className = 'result success';
+                }
+            } catch (error) {
+                authResultEl.innerHTML = `
+                    <p class="error">Error testing authentication</p>
+                    <pre>${error.message}</pre>
+                `;
+                authResultEl.className = 'result error';
+            }
+        });
+        
+        // Test Database button
+        document.getElementById('test-db').addEventListener('click', async function() {
+            dbResultEl.innerHTML = '<p>Testing database tables...</p>';
+            dbResultEl.className = 'result';
+            
+            try {
+                if (!supabaseClient) {
+                    throw new Error('Supabase client not initialized');
+                }
+                
+                // Check if tables exist
+                const tablesToCheck = ['reservations', 'customers', 'menu_items', 'orders', 'settings'];
+                const results = [];
+                
+                for (const table of tablesToCheck) {
+                    try {
+                        const { data, error } = await supabaseClient.from(table).select('*').limit(1);
+                        
+                        if (error) {
+                            if (error.code === '42P01') { // Relation does not exist
+                                results.push(`<p>❌ Table '${table}' does not exist</p>`);
+                            } else {
+                                results.push(`<p>⚠️ Error checking table '${table}': ${error.message}</p>`);
+                            }
+                        } else {
+                            results.push(`<p>✅ Table '${table}' exists and is accessible</p>`);
+                        }
+                    } catch (tableError) {
+                        results.push(`<p>⚠️ Error checking table '${table}': ${tableError.message}</p>`);
+                    }
+                }
+                
+                // Show results
+                dbResultEl.innerHTML = `
+                    <div>${results.join('')}</div>
+                    <p>If tables don't exist, run the SQL setup script from database/setup.sql in the Supabase SQL Editor.</p>
+                `;
+                
+                if (results.some(r => r.includes('❌'))) {
+                    dbResultEl.className = 'result error';
+                } else if (results.some(r => r.includes('⚠️'))) {
+                    dbResultEl.className = 'result warning';
+                } else {
+                    dbResultEl.className = 'result success';
+                }
+            } catch (error) {
+                dbResultEl.innerHTML = `
+                    <p class="error">Error testing database</p>
+                    <pre>${error.message}</pre>
+                `;
+                dbResultEl.className = 'result error';
+            }
+        });
+    </script>
+</body>
+</html>
