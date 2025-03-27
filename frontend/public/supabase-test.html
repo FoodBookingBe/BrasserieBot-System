@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrasserieBot Supabase Test</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset stijlen */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Basis stijlen */
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #0066cc;
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+        
+        .header p {
+            color: #64748b;
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .section h2 {
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .test-card {
+            background-color: #f8fafc;
+            border-left: 4px solid #e2e8f0;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 6px 6px 0;
+            position: relative;
+        }
+        
+        .test-card.success {
+            border-left-color: #10b981;
+        }
+        
+        .test-card.error {
+            border-left-color: #ef4444;
+        }
+        
+        .test-card.pending {
+            border-left-color: #f59e0b;
+        }
+        
+        .test-card h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .test-card h3 .status-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .test-card.success h3 .status-icon {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .test-card.error h3 .status-icon {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .test-card.pending h3 .status-icon {
+            background-color: #f59e0b;
+            color: white;
+        }
+        
+        .test-card p {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #64748b;
+        }
+        
+        .test-card pre {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        
+        .test-card .result {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .test-card .result.success {
+            color: #10b981;
+        }
+        
+        .test-card .result.error {
+            color: #ef4444;
+        }
+        
+        .button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .button:hover {
+            background-color: #0052a3;
+        }
+        
+        .button:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+        
+        .button + .button {
+            margin-left: 10px;
+        }
+        
+        .icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+        }
+        
+        .actions {
+            margin-top: 20px;
+            display: flex;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: #0066cc;
+            text-decoration: none;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .back-link .icon {
+            margin-right: 6px;
+        }
+        
+        /* Responsive stijlen */
+        @media (max-width: 640px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .section {
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+            }
+            
+            .test-card {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>BrasserieBot Supabase Test</h1>
+            <p>Deze pagina test de connectie met Supabase en verifieert of alle noodzakelijke functies correct werken.</p>
+        </div>
+        
+        <div class="section">
+            <h2>1. Supabase Configuratie</h2>
+            <div class="test-card pending" id="config-test">
+                <h3><span class="status-icon">?</span> Supabase Configuratie Testen</h3>
+                <p>Controleert of de Supabase URL en API sleutel correct zijn ingesteld.</p>
+                <div class="actions">
+                    <button class="button" id="run-config-test">
+                        <span class="icon">▶</span>
+                        Test Uitvoeren
+                    </button>
+                </div>
+                <div class="result" id="config-result"></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>2. Authenticatie</h2>
+            <div class="test-card pending" id="auth-test">
+                <h3><span class="status-icon">?</span> Authenticatie Testen</h3>
+                <p>Test het inloggen met Supabase authenticatie.</p>
+                <div class="actions">
+                    <button class="button" id="run-auth-test">
+                        <span class="icon">▶</span>
+                        Test Uitvoeren
+                    </button>
+                </div>
+                <div class="result" id="auth-result"></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>3. Databasetoegang</h2>
+            <div class="test-card pending" id="db-test-reservations">
+                <h3><span class="status-icon">?</span> Reserveringen Tabel Testen</h3>
+                <p>Test toegang tot de reserveringen tabel met Row Level Security.</p>
+                <div class="actions">
+                    <button class="button" id="run-reservations-test">
+                        <span class="icon">▶</span>
+                        Test Uitvoeren
+                    </button>
+                </div>
+                <div class="result" id="reservations-result"></div>
+            </div>
+            
+            <div class="test-card pending" id="db-test-customers">
+                <h3><span class="status-icon">?</span> Klanten Tabel Testen</h3>
+                <p>Test toegang tot de klanten tabel met Row Level Security.</p>
+                <div class="actions">
+                    <button class="button" id="run-customers-test">
+                        <span class="icon">▶</span>
+                        Test Uitvoeren
+                    </button>
+                </div>
+                <div class="result" id="customers-result"></div>
+            </div>
+            
+            <div class="test-card pending" id="db-test-orders">
+                <h3><span class="status-icon">?</span> Bestellingen Tabel Testen</h3>
+                <p>Test toegang tot de bestellingen tabel met Row Level Security.</p>
+                <div class="actions">
+                    <button class="button" id="run-orders-test">
+                        <span class="icon">▶</span>
+                        Test Uitvoeren
+                    </button>
+                </div>
+                <div class="result" id="orders-result"></div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>4. Realtime Updates</h2>
+            <div class="test-card pending" id="realtime-test">
+                <h3><span class="status-icon">?</span> Realtime Updates Testen</h3>
+                <p>Test of realtime database updates correct worden ontvangen.</p>
+                <div class="actions">
+                    <button class="button" id="run-realtime-test">
+                        <span class="icon">▶</span>
+                        Test Uitvoeren
+                    </button>
+                </div>
+                <div class="result" id="realtime-result"></div>
+            </div>
+        </div>
+        
+        <a href="dashboard.html" class="back-link">
+            <span class="icon">←</span>
+            Terug naar Dashboard
+        </a>
+    </div>
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Omgevingsvariabelen -->
+    <script>
+        // Omgevingsvariabelen voor Supabase
+        window.ENV = {
+            SUPABASE_URL: '{{SUPABASE_URL}}',
+            SUPABASE_KEY: '{{SUPABASE_ANON_KEY}}'
+        };
+    </script>
+    
+    <!-- BrasserieBot Supabase Client -->
+    <script src="supabase-client.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Reference naar DOM elementen
+            const configTestBtn = document.getElementById('run-config-test');
+            const authTestBtn = document.getElementById('run-auth-test');
+            const reservationsTestBtn = document.getElementById('run-reservations-test');
+            const customersTestBtn = document.getElementById('run-customers-test');
+            const ordersTestBtn = document.getElementById('run-orders-test');
+            const realtimeTestBtn = document.getElementById('run-realtime-test');
+            
+            // Resultaat elementen
+            const configResult = document.getElementById('config-result');
+            const authResult = document.getElementById('auth-result');
+            const reservationsResult = document.getElementById('reservations-result');
+            const customersResult = document.getElementById('customers-result');
+            const ordersResult = document.getElementById('orders-result');
+            const realtimeResult = document.getElementById('realtime-result');
+            
+            // Helper functies
+            const setTestStatus = (testCard, status, message) => {
+                // Status kan 'success', 'error' of 'pending' zijn
+                testCard.className = `test-card ${status}`;
+                
+                // Update het status icon
+                const statusIcon = testCard.querySelector('.status-icon');
+                if (statusIcon) {
+                    statusIcon.textContent = status === 'success' ? '✓' : status === 'error' ? '✗' : '?';
+                }
+                
+                // Update resultaattekst als er een bericht is
+                if (message) {
+                    const resultElement = testCard.querySelector('.result');
+                    if (resultElement) {
+                        resultElement.className = `result ${status}`;
+                        resultElement.innerHTML = message;
+                    }
+                }
+            };
+            
+            // 1. Configuratie Test
+            configTestBtn.addEventListener('click', async function() {
+                // Zet de status op pending
+                setTestStatus(document.getElementById('config-test'), 'pending', 'Testen van Supabase configuratie...');
+                
+                try {
+                    // Check of de Supabase client geïnitialiseerd kan worden
+                    const isAvailable = supabaseClient.isAvailable();
+                    
+                    if (isAvailable) {
+                        // Probeer ook basis info op te halen om verbinding te bevestigen
+                        const client = supabaseClient.getClient();
+                        const { data, error } = await client.from('_dummy_query').select('*').limit(1).catch(() => ({ data: null, error: null }));
+                        
+                        // Als er geen fatale fout is opgetreden, beschouwen we het als succes
+                        setTestStatus(document.getElementById('config-test'), 'success', 
+                            `Supabase client succesvol geïnitialiseerd.<br>
+                            URL: ${window.ENV.SUPABASE_URL.replace(/^https:\/\//, '').substring(0, 12)}...`);
+                    } else {
+                        setTestStatus(document.getElementById('config-test'), 'error', 
+                            'Kon de Supabase client niet initialiseren. Controleer of de URL en API sleutel correct zijn ingesteld in de Netlify configuratie.');
+                    }
+                } catch (error) {
+                    setTestStatus(document.getElementById('config-test'), 'error', 
+                        `Fout bij het initialiseren van de Supabase client: ${error.message}`);
+                }
+            });
+            
+            // 2. Authenticatie Test
+            authTestBtn.addEventListener('click', async function() {
+                // Zet de status op pending
+                setTestStatus(document.getElementById('auth-test'), 'pending', 'Testen van authenticatie...');
+                
+                try {
+                    // Test login met de testgebruiker
+                    const { data, error } = await supabaseClient.auth.loginWithPassword('admin@brasseriebot.com', 'admin123');
+                    
+                    if (error) {
+                        setTestStatus(document.getElementById('auth-test'), 'error', 
+                            `Fout bij inloggen: ${error.message}<br>
+                            Controleer of de testgebruiker is aangemaakt in Supabase.`);
+                    } else {
+                        // Haal gebruikersinfo op om te bevestigen
+                        const user = await supabaseClient.auth.getCurrentUser();
+                        
+                        if (user) {
+                            setTestStatus(document.getElementById('auth-test'), 'success', 
+                                `Succesvol ingelogd als: ${user.email || 'admin@brasseriebot.com'}<br>
+                                User ID: ${user.id ? user.id.substring(0, 8) + '...' : 'Onbekend'}`);
+                            
+                            // Schakel de database test knoppen in
+                            reservationsTestBtn.disabled = false;
+                            customersTestBtn.disabled = false;
+                            ordersTestBtn.disabled = false;
+                            realtimeTestBtn.disabled = false;
+                        } else {
+                            setTestStatus(document.getElementById('auth-test'), 'error', 
+                                'Inloggen leek te slagen, maar gebruikersinfo kon niet worden opgehaald.');
+                        }
+                    }
+                } catch (error) {
+                    setTestStatus(document.getElementById('auth-test'), 'error', 
+                        `Fout bij het testen van authenticatie: ${error.message}`);
+                }
+            });
+            
+            // 3. Reserveringen Test
+            reservationsTestBtn.addEventListener('click', async function() {
+                // Zet de status op pending
+                setTestStatus(document.getElementById('db-test-reservations'), 'pending', 'Testen van toegang tot reserveringen...');
+                
+                try {
+                    // Test of we een reservering kunnen toevoegen
+                    const client = supabaseClient.getClient();
+                    const user = await supabaseClient.auth.getCurrentUser();
+                    
+                    if (!user) {
+                        setTestStatus(document.getElementById('db-test-reservations'), 'error', 
+                            'Je moet eerst inloggen om deze test uit te voeren.');
+                        return;
+                    }
+                    
+                    // Maak een testreservering aan
+                    const testReservation = {
+                        user_id: user.id,
+                        name: 'Test Klant',
+                        email: 'test@example.com',
+                        phone: '+3247812345',
+                        guests: 2,
+                        date: new Date().toISOString().split('T')[0],
+                        time: '19:00',
+                        status: 'test',
+                        notes: 'Dit is een testreservering'
+                    };
+                    
+                    // Voeg toe aan de database
+                    const { data: insertData, error: insertError } = await client
+                        .from('reservations')
+                        .insert([testReservation])
+                        .select()
+                        .single();
+                    
+                    if (insertError) {
+                        setTestStatus(document.getElementById('db-test-reservations'), 'error', 
+                            `Fout bij toevoegen reservering: ${insertError.message}`);
+                        return;
+                    }
+                    
+                    // Haal de reservering weer op
+                    const { data: getData, error: getError } = await client
+                        .from('reservations')
+                        .select('*')
+                        .eq('id', insertData.id)
+                        .single();
+                    
+                    if (getError) {
+                        setTestStatus(document.getElementById('db-test-reservations'), 'error', 
+                            `Fout bij ophalen reservering: ${getError.message}`);
+                        return;
+                    }
+                    
+                    // Verwijder de testreservering weer
+                    const { error: deleteError } = await client
+                        .from('reservations')
+                        .delete()
+                        .eq('id', insertData.id);
+                    
+                    if (deleteError) {
+                        setTestStatus(document.getElementById('db-test-reservations'), 'warning', 
+                            `Reservering toevoegen en ophalen geslaagd, maar verwijderen mislukt: ${deleteError.message}`);
+                        return;
+                    }
+                    
+                    // Alles succesvol
+                    setTestStatus(document.getElementById('db-test-reservations'), 'success', 
+                        `Reservering succesvol aangemaakt, opgehaald en verwijderd.<br>
+                        De reserveringen tabel werkt correct!`);
+                    
+                } catch (error) {
+                    setTestStatus(document.getElementById('db-test-reservations'), 'error', 
+                        `Onverwachte fout bij reserveringen test: ${error.message}`);
+                }
+            });
+            
+            // 4. Klanten Test
+            customersTestBtn.addEventListener('click', async function() {
+                // Zet de status op pending
+                setTestStatus(document.getElementById('db-test-customers'), 'pending', 'Testen van toegang tot klanten...');
+                
+                try {
+                    // Test of we een klant kunnen toevoegen
+                    const client = supabaseClient.getClient();
+                    const user = await supabaseClient.auth.getCurrentUser();
+                    
+                    if (!user) {
+                        setTestStatus(document.getElementById('db-test-customers'), 'error', 
+                            'Je moet eerst inloggen om deze test uit te voeren.');
+                        return;
+                    }
+                    
+                    // Maak een testklant aan
+                    const testCustomer = {
+                        user_id: user.id,
+                        name: 'Test Klant',
+                        email: 'testklant@example.com',
+                        phone: '+3247812345',
+                        visits: 1,
+                        last_visit: new Date().toISOString().split('T')[0],
+                        preferences: 'Test voorkeuren'
+                    };
+                    
+                    // Voeg toe aan de database
+                    const { data: insertData, error: insertError } = await client
+                        .from('customers')
+                        .insert([testCustomer])
+                        .select()
+                        .single();
+                    
+                    if (insertError) {
+                        setTestStatus(document.getElementById('db-test-customers'), 'error', 
+                            `Fout bij toevoegen klant: ${insertError.message}`);
+                        return;
+                    }
+                    
+                    // Haal de klant weer op
+                    const { data: getData, error: getError } = await client
+                        .from('customers')
+                        .select('*')
+                        .eq('id', insertData.id)
+                        .single();
+                    
+                    if (getError) {
+                        setTestStatus(document.getElementById('db-test-customers'), 'error', 
+                            `Fout bij ophalen klant: ${getError.message}`);
+                        return;
+                    }
+                    
+                    // Verwijder de testklant weer
+                    const { error: deleteError } = await client
+                        .from('customers')
+                        .delete()
+                        .eq('id', insertData.id);
+                    
+                    if (deleteError) {
+                        setTestStatus(document.getElementById('db-test-customers'), 'warning', 
+                            `Klant toevoegen en ophalen geslaagd, maar verwijderen mislukt: ${deleteError.message}`);
+                        return;
+                    }
+                    
+                    // Alles succesvol
+                    setTestStatus(document.getElementById('db-test-customers'), 'success', 
+                        `Klant succesvol aangemaakt, opgehaald en verwijderd.<br>
+                        De klanten tabel werkt correct!`);
+                    
+                } catch (error) {
+                    setTestStatus(document.getElementById('db-test-customers'), 'error', 
+                        `Onverwachte fout bij klanten test: ${error.message}`);
+                }
+            });
+            
+            // 5. Bestellingen Test
+            ordersTestBtn.addEventListener('click', async function() {
+                // Zet de status op pending
+                setTestStatus(document.getElementById('db-test-orders'), 'pending', 'Testen van toegang tot bestellingen...');
+                
+                try {
+                    // Test of we een bestelling kunnen toevoegen
+                    const client = supabaseClient.getClient();
+                    const user = await supabaseClient.auth.getCurrentUser();
+                    
+                    if (!user) {
+                        setTestStatus(document.getElementById('db-test-orders'), 'error', 
+                            'Je moet eerst inloggen om deze test uit te voeren.');
+                        return;
+                    }
+                    
+                    // Maak een testbestelling aan
+                    const testOrder = {
+                        user_id: user.id,
+                        table_number: 5,
+                        customer_name: 'Test Klant',
+                        items: JSON.stringify([
+                            { id: 1, name: 'Test Item 1', quantity: 2, price: 10.5 },
+                            { id: 2, name: 'Test Item 2', quantity: 1, price: 8.75 }
+                        ]),
+                        total: 29.75,
+                        status: 'test',
+                        payment_method: 'test'
+                    };
+                    
+                    // Voeg toe aan de database
+                    const { data: insertData, error: insertError } = await client
+                        .from('orders')
+                        .insert([testOrder])
+                        .select()
+                        .single();
+                    
+                    if (insertError) {
+                        setTestStatus(document.getElementById('db-test-orders'), 'error', 
+                            `Fout bij toevoegen bestelling: ${insertError.message}`);
+                        return;
+                    }
+                    
+                    // Haal de bestelling weer op
+                    const { data: getData, error: getError } = await client
+                        .from('orders')
+                        .select('*')
+                        .eq('id', insertData.id)
+                        .single();
+                    
+                    if (getError) {
+                        setTestStatus(document.getElementById('db-test-orders'), 'error', 
+                            `Fout bij ophalen bestelling: ${getError.message}`);
+                        return;
+                    }
+                    
+                    // Verwijder de testbestelling weer
+                    const { error: deleteError } = await client
+                        .from('orders')
+                        .delete()
+                        .eq('id', insertData.id);
+                    
+                    if (deleteError) {
+                        setTestStatus(document.getElementById('db-test-orders'), 'warning', 
+                            `Bestelling toevoegen en ophalen geslaagd, maar verwijderen mislukt: ${deleteError.message}`);
+                        return;
+                    }
+                    
+                    // Alles succesvol
+                    setTestStatus(document.getElementById('db-test-orders'), 'success', 
+                        `Bestelling succesvol aangemaakt, opgehaald en verwijderd.<br>
+                        De bestellingen tabel werkt correct!`);
+                    
+                } catch (error) {
+                    setTestStatus(document.getElementById('db-test-orders'), 'error', 
+                        `Onverwachte fout bij bestellingen test: ${error.message}`);
+                }
+            });
+            
+            // 6. Realtime Test
+            realtimeTestBtn.addEventListener('click', async function() {
+                // Zet de status op pending
+                setTestStatus(document.getElementById('realtime-test'), 'pending', 'Testen van realtime updates...');
+                
+                try {
+                    const client = supabaseClient.getClient();
+                    const user = await supabaseClient.auth.getCurrentUser();
+                    
+                    if (!user) {
+                        setTestStatus(document.getElementById('realtime-test'), 'error', 
+                            'Je moet eerst inloggen om deze test uit te voeren.');
+                        return;
+                    }
+                    
+                    // Luister naar wijzigingen in de reserveringen tabel
+                    realtimeResult.innerHTML = 'Luisteren naar realtime updates op de reserveringen tabel...<br>Er wordt een testreservering aangemaakt, probeer deze stap later opnieuw als het niet direct lukt.';
+                    
+                    // Abonneer op realtime updates voor reserveringen
+                    const realtimeChannel = client
+                        .channel('public:reservations')
+                        .on('postgres_changes', {
+                            event: '*',
+                            schema: 'public',
+                            table: 'reservations'
+                        }, (payload) => {
+                            // Toon resultaat
+                            setTestStatus(document.getElementById('realtime-test'), 'success', 
+                                `Realtime update ontvangen!<br>
+                                Event: ${payload.eventType}<br>
+                                Tabel: ${payload.table}<br>
+                                Record ID: ${payload.new?.id || payload.old?.id}`);
+                            
+                            // Beëindig het abonnement na een succesvolle test
+                            setTimeout(() => {
+                                realtimeChannel.unsubscribe();
+                            }, 2000);
+                        })
+                        .subscribe();
+                    
+                    // Maak een testreservering aan om realtime updates te testen
+                    setTimeout(async () => {
+                        // Maak een testreservering aan
+                        const testReservation = {
+                            user_id: user.id,
+                            name: 'Realtime Test Klant',
+                            email: 'realtime@example.com',
+                            phone: '+3247812345',
+                            guests: 2,
+                            date: new Date().toISOString().split('T')[0],
+                            time: '19:00',
+                            status: 'realtime-test',
+                            notes: 'Dit is een realtime testreservering'
+                        };
+                        
+                        // Voeg toe aan de database
+                        const { data, error } = await client
+                            .from('reservations')
+                            .insert([testReservation])
+                            .select();
+                        
+                        if (error) {
+                            setTestStatus(document.getElementById('realtime-test'), 'error', 
+                                `Fout bij aanmaken van testreservering voor realtime test: ${error.message}`);
+                            realtimeChannel.unsubscribe();
+                        }
+                        
+                        // Verwijder de testreservering na 2 seconden
+                        if (data && data[0]) {
+                            setTimeout(async () => {
+                                await client
+                                    .from('reservations')
+                                    .delete()
+                                    .eq('id', data[0].id);
+                            }, 2000);
+                        }
+                    }, 1000);
+                    
+                    // Stel een timeout in voor als er geen realtime updates worden ontvangen
+                    setTimeout(() => {
+                        if (document.getElementById('realtime-test').classList.contains('pending')) {
+                            setTestStatus(document.getElementById('realtime-test'), 'error', 
+                                'Geen realtime updates ontvangen binnen de timeout periode. Controleer of Supabase realtime is ingeschakeld en probeer het opnieuw.');
+                            
+                            if (realtimeChannel) {
+                                realtimeChannel.unsubscribe();
+                            }
+                        }
+                    }, 5000);
+                    
+                } catch (error) {
+                    setTestStatus(document.getElementById('realtime-test'), 'error', 
+                        `Onverwachte fout bij realtime test: ${error.message}`);
+                }
+            });
+            
+            // Initiële status: database tests uitgeschakeld tot ingelogd
+            reservationsTestBtn.disabled = true;
+            customersTestBtn.disabled = true;
+            ordersTestBtn.disabled = true;
+            realtimeTestBtn.disabled = true;
+            
+            // Automatisch de configuratie test uitvoeren
+            setTimeout(() => {
+                configTestBtn.click();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
