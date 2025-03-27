@@ -7,8 +7,8 @@
 const supabaseClient = (function() {
     // Configuratie (deze waarden worden ingesteld door Netlify via process-html.js)
     // De waarden tussen {{}} worden vervangen tijdens het build proces
-    const SUPABASE_DATABASE_URL = "https://yucpwawshjmonwsgvsfq.supabase.co";
-    const SUPABASE_ANON_KEY = "test-key-123456";
+    const SUPABASE_DATABASE_URL = "https://test-supabase-url.supabase.co";
+    const SUPABASE_ANON_KEY = "test-supabase-key-for-verification";
     
     // Privévariabelen
     let _initialized = false;
@@ -43,7 +43,7 @@ const supabaseClient = (function() {
                 
                 console.log('Initializing Supabase client with URL:', supabaseUrl);
                 
-                if (supabaseKey === "test-key-123456" || supabaseKey === "your-anon-key") {
+                if (supabaseKey === "test-supabase-key-for-verification" || supabaseKey === "your-anon-key") {
                     console.warn('WARNING: Using placeholder SUPABASE_ANON_KEY. Netlify environment variables may not be configured correctly.');
                 }
                 
