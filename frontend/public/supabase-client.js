@@ -7,8 +7,8 @@
 const supabaseClient = (function() {
     // Configuratie (deze waarden worden ingesteld door Netlify via process-html.js)
     // De waarden tussen {{}} worden vervangen tijdens het build proces
-    const SUPABASE_DATABASE_URL = "https://yucpwawshjmonwsgvsfq.supabase.co";
-    const SUPABASE_ANON_KEY = "test-key-123456";
+    const SUPABASE_DATABASE_URL = "{{SUPABASE_DATABASE_URL}}";
+    const SUPABASE_ANON_KEY = "{{SUPABASE_ANON_KEY}}";
     
     // Privévariabelen
     let _initialized = false;
@@ -43,7 +43,7 @@ const supabaseClient = (function() {
                 
                 console.log('Initializing Supabase client with URL:', supabaseUrl);
                 
-                if (supabaseKey === "test-key-123456" || supabaseKey === "your-anon-key") {
+                if (supabaseKey === "{{SUPABASE_ANON_KEY}}" || supabaseKey === "your-anon-key") {
                     console.warn('WARNING: Using placeholder SUPABASE_ANON_KEY. Netlify environment variables may not be configured correctly.');
                 }
                 
@@ -200,6 +200,28 @@ const supabaseClient = (function() {
                     return { data };
                 } catch (error) {
                     console.error('Registratie fout:', error);
+                    return { error };
+                }
+            },
+            
+            /**
+             * Stuur een wachtwoord reset e-mail
+             * @param {string} email E-mailadres om reset link naar te sturen
+             * @param {Object} options Opties zoals redirectTo URL
+             * @returns {Promise} Promise met reset resultaat
+             */
+            resetPasswordForEmail: async function(email, options = {}) {
+                if (!_initClient()) {
+                    return { error: { message: 'Supabase client niet geïnitialiseerd' } };
+                }
+                
+                try {
+                    const { data, error } = await _client.auth.resetPasswordForEmail(email, options);
+                    
+                    if (error) throw error;
+                    return { data };
+                } catch (error) {
+                    console.error('Wachtwoord reset fout:', error);
                     return { error };
                 }
             },

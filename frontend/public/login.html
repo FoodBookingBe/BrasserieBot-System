@@ -82,7 +82,17 @@
             font-size: 14px;
         }
         
-        .error-message.show {
+        .success-message {
+            display: none;
+            background-color: #d1fae5;
+            color: #047857;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .error-message.show, .success-message.show {
             display: block;
         }
         
@@ -108,6 +118,46 @@
             margin-top: 30px;
             color: #6b7280;
             font-size: 14px;
+        }
+        
+        .auth-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        
+        .auth-link {
+            color: #0066cc;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .auth-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Formulieren wisselen */
+        #reset-password-form, #register-form {
+            display: none;
+        }
+        
+        .form-nav {
+            display: flex;
+            margin-bottom: 24px;
+        }
+        
+        .form-nav-item {
+            padding: 8px 16px;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .form-nav-item.active {
+            color: #0066cc;
+            border-bottom-color: #0066cc;
         }
         
         /* Responsive aanpassingen */
@@ -138,14 +188,24 @@
     <div class="login-container">
         <h1 class="login-title">BrasserieBot</h1>
         
+        <div class="form-nav">
+            <div class="form-nav-item active" id="login-nav">Inloggen</div>
+            <div class="form-nav-item" id="register-nav">Registreren</div>
+        </div>
+        
         <div id="error-message" class="error-message">
             Ongeldige gebruikersnaam of wachtwoord. Probeer het opnieuw.
         </div>
         
+        <div id="success-message" class="success-message">
+            Succes! Een e-mail is verzonden met instructies.
+        </div>
+        
+        <!-- Login formulier -->
         <form id="login-form">
             <div class="form-group">
-                <label for="username" class="form-label">Gebruikersnaam</label>
-                <input type="text" id="username" name="username" class="form-input" placeholder="Vul uw gebruikersnaam in" autocomplete="username" required>
+                <label for="username" class="form-label">Gebruikersnaam/E-mail</label>
+                <input type="text" id="username" name="username" class="form-input" placeholder="Vul uw gebruikersnaam of e-mail in" autocomplete="username" required>
             </div>
             
             <div class="form-group">
@@ -154,6 +214,59 @@
             </div>
             
             <button type="submit" class="login-button">Inloggen</button>
+            
+            <div class="auth-links">
+                <a id="forgot-password-link" class="auth-link">Wachtwoord vergeten?</a>
+                <a id="show-register-link" class="auth-link">Nieuw account</a>
+            </div>
+        </form>
+        
+        <!-- Wachtwoord reset formulier -->
+        <form id="reset-password-form" style="display: none;">
+            <div class="form-group">
+                <label for="reset-email" class="form-label">E-mail</label>
+                <input type="email" id="reset-email" name="reset-email" class="form-input" placeholder="Vul uw e-mailadres in" required>
+            </div>
+            
+            <button type="submit" class="login-button">Reset wachtwoord</button>
+            
+            <div class="auth-links">
+                <a id="back-to-login-link" class="auth-link">Terug naar inloggen</a>
+            </div>
+        </form>
+        
+        <!-- Registratie formulier -->
+        <form id="register-form" style="display: none;">
+            <div class="form-group">
+                <label for="register-name" class="form-label">Volledige naam</label>
+                <input type="text" id="register-name" name="register-name" class="form-input" placeholder="Vul uw volledige naam in" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-email" class="form-label">E-mail</label>
+                <input type="email" id="register-email" name="register-email" class="form-input" placeholder="Vul uw e-mailadres in" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-business" class="form-label">Bedrijfsnaam</label>
+                <input type="text" id="register-business" name="register-business" class="form-input" placeholder="Vul uw bedrijfsnaam in" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-password" class="form-label">Wachtwoord</label>
+                <input type="password" id="register-password" name="register-password" class="form-input" placeholder="Kies een wachtwoord" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="register-password-confirm" class="form-label">Bevestig wachtwoord</label>
+                <input type="password" id="register-password-confirm" name="register-password-confirm" class="form-input" placeholder="Bevestig uw wachtwoord" required>
+            </div>
+            
+            <button type="submit" class="login-button">Account aanmaken</button>
+            
+            <div class="auth-links">
+                <a id="back-to-login-from-register" class="auth-link">Terug naar inloggen</a>
+            </div>
         </form>
         
         <div class="login-footer">
@@ -174,8 +287,60 @@
     <script>
         // Initialisatie
         document.addEventListener('DOMContentLoaded', function() {
+            // DOM elementen ophalen
+            const loginForm = document.getElementById('login-form');
+            const resetPasswordForm = document.getElementById('reset-password-form');
+            const registerForm = document.getElementById('register-form');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+            
+            // Navigatie elementen
+            const loginNav = document.getElementById('login-nav');
+            const registerNav = document.getElementById('register-nav');
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+            const showRegisterLink = document.getElementById('show-register-link');
+            const backToLoginLink = document.getElementById('back-to-login-link');
+            const backToLoginFromRegister = document.getElementById('back-to-login-from-register');
+            
             // Controleer of Supabase client beschikbaar is
             const isSupabaseAvailable = typeof supabaseClient !== 'undefined' && supabaseClient.isAvailable();
+            
+            // Formulier navigatie functies
+            function showLoginForm() {
+                loginForm.style.display = 'block';
+                resetPasswordForm.style.display = 'none';
+                registerForm.style.display = 'none';
+                loginNav.classList.add('active');
+                registerNav.classList.remove('active');
+                errorMessage.classList.remove('show');
+                successMessage.classList.remove('show');
+            }
+            
+            function showResetPasswordForm() {
+                loginForm.style.display = 'none';
+                resetPasswordForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                errorMessage.classList.remove('show');
+                successMessage.classList.remove('show');
+            }
+            
+            function showRegisterForm() {
+                loginForm.style.display = 'none';
+                resetPasswordForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                loginNav.classList.remove('active');
+                registerNav.classList.add('active');
+                errorMessage.classList.remove('show');
+                successMessage.classList.remove('show');
+            }
+            
+            // Event listeners voor navigatie
+            loginNav.addEventListener('click', showLoginForm);
+            registerNav.addEventListener('click', showRegisterForm);
+            forgotPasswordLink.addEventListener('click', showResetPasswordForm);
+            showRegisterLink.addEventListener('click', showRegisterForm);
+            backToLoginLink.addEventListener('click', showLoginForm);
+            backToLoginFromRegister.addEventListener('click', showLoginForm);
             
             // Check of gebruiker al is ingelogd (via Supabase of localStorage)
             const checkAuthState = async () => {
@@ -202,10 +367,7 @@
             // Controleer authenticatie
             checkAuthState();
             
-            // Login formulier event listeners
-            const loginForm = document.getElementById('login-form');
-            const errorMessage = document.getElementById('error-message');
-            
+            // Login formulier submissie
             loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
@@ -253,35 +415,181 @@
                     // Fallback login direct gebruiken
                     tryFallbackLogin(username, password);
                 }
+            });
+            
+            // Wachtwoord reset formulier submissie
+            resetPasswordForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
                 
-                // Fallback login functie
-                function tryFallbackLogin(username, password) {
-                    // Fallback voor demo/ontwikkeling wanneer Supabase niet beschikbaar is
-                    if ((username === 'admin' && password === 'admin123') ||
-                        (username === 'user' && password === 'user123')) {
+                const email = document.getElementById('reset-email').value.trim();
+                
+                // Validatie
+                if (!email) {
+                    errorMessage.textContent = 'Vul uw e-mailadres in a.u.b.';
+                    errorMessage.classList.add('show');
+                    return;
+                }
+                
+                if (isSupabaseAvailable) {
+                    // Reset via Supabase
+                    errorMessage.classList.remove('show');
+                    
+                    try {
+                        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                            redirectTo: window.location.origin + '/reset-password.html',
+                        });
                         
-                        // Gebruiker opslaan in localStorage
+                        if (error) {
+                            errorMessage.textContent = error.message || 'Er is een fout opgetreden. Probeer het later opnieuw.';
+                            errorMessage.classList.add('show');
+                        } else {
+                            // Toon succes bericht
+                            successMessage.textContent = 'Wachtwoord reset e-mail verzonden. Controleer uw inbox.';
+                            successMessage.classList.add('show');
+                            document.getElementById('reset-email').value = '';
+                        }
+                    } catch (err) {
+                        console.error('Wachtwoord reset fout:', err);
+                        errorMessage.textContent = 'Er is een technische fout opgetreden. Probeer het later opnieuw.';
+                        errorMessage.classList.add('show');
+                    }
+                } else {
+                    // Fallback voor demo
+                    successMessage.textContent = 'Demo modus: In productie zou hier een wachtwoord reset e-mail worden verzonden.';
+                    successMessage.classList.add('show');
+                    document.getElementById('reset-email').value = '';
+                }
+            });
+            
+            // Registratie formulier submissie
+            registerForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('register-name').value.trim();
+                const email = document.getElementById('register-email').value.trim();
+                const business = document.getElementById('register-business').value.trim();
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-password-confirm').value;
+                
+                // Validatie
+                if (!name || !email || !business || !password || !confirmPassword) {
+                    errorMessage.textContent = 'Vul alle velden in a.u.b.';
+                    errorMessage.classList.add('show');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    errorMessage.textContent = 'Wachtwoorden komen niet overeen';
+                    errorMessage.classList.add('show');
+                    return;
+                }
+                
+                if (password.length < 6) {
+                    errorMessage.textContent = 'Wachtwoord moet minstens 6 tekens bevatten';
+                    errorMessage.classList.add('show');
+                    return;
+                }
+                
+                if (isSupabaseAvailable) {
+                    // Registreer via Supabase
+                    errorMessage.classList.remove('show');
+                    
+                    try {
+                        const { data, error } = await supabaseClient.auth.registerWithPassword(email, password, {
+                            name: name,
+                            restaurantName: business,
+                            role: 'user'
+                        });
+                        
+                        if (error) {
+                            errorMessage.textContent = error.message || 'Registratie mislukt. Probeer het later opnieuw.';
+                            errorMessage.classList.add('show');
+                        } else {
+                            // Toon succes bericht en redirect
+                            successMessage.textContent = 'Registratie succesvol! U wordt doorgestuurd naar het dashboard.';
+                            successMessage.classList.add('show');
+                            
+                            // Maak ook een customer record aan
+                            try {
+                                await supabaseClient.db.create('customers', {
+                                    user_id: data.user.id,
+                                    name: name,
+                                    email: email,
+                                    business_name: business,
+                                    created_at: new Date().toISOString()
+                                });
+                            } catch (dbErr) {
+                                console.error('Klantrecord aanmaken fout:', dbErr);
+                            }
+                            
+                            // Redirect na 2 seconden
+                            setTimeout(() => {
+                                window.location.href = 'dashboard.html';
+                            }, 2000);
+                        }
+                    } catch (err) {
+                        console.error('Registratie fout:', err);
+                        errorMessage.textContent = 'Er is een technische fout opgetreden. Probeer het later opnieuw.';
+                        errorMessage.classList.add('show');
+                    }
+                } else {
+                    // Fallback voor demo
+                    if (email === 'admin@brasseriebot.com' || email === 'user@brasseriebot.com') {
+                        errorMessage.textContent = 'Dit e-mailadres is al in gebruik';
+                        errorMessage.classList.add('show');
+                    } else {
+                        // Gebruiker opslaan in localStorage voor demo
                         const userData = {
-                            username: username,
+                            username: email.split('@')[0],
                             email: email,
-                            role: username === 'admin' ? 'admin' : 'user',
-                            restaurantName: username === 'admin' ? 'Demo Restaurant' : 'Test Brasserie',
+                            role: 'user',
+                            restaurantName: business,
+                            name: name,
                             lastLogin: new Date().toISOString()
                         };
                         
                         localStorage.setItem('brasseriebot_user', JSON.stringify(userData));
                         localStorage.setItem('brasseriebot_auth_time', Date.now().toString());
                         
-                        // Doorsturen naar dashboard
-                        window.location.href = 'dashboard.html';
-                    } else {
-                        // Toon foutmelding
-                        errorMessage.textContent = 'Ongeldige gebruikersnaam of wachtwoord. Probeer het opnieuw.';
-                        errorMessage.classList.add('show');
-                        document.getElementById('password').value = '';
+                        // Toon succes bericht en redirect
+                        successMessage.textContent = 'Demo account aangemaakt! U wordt doorgestuurd.';
+                        successMessage.classList.add('show');
+                        
+                        // Redirect na 2 seconden
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 2000);
                     }
                 }
             });
+            
+            // Fallback login functie
+            function tryFallbackLogin(username, password) {
+                // Fallback voor demo/ontwikkeling wanneer Supabase niet beschikbaar is
+                if ((username === 'admin' && password === 'admin123') ||
+                    (username === 'user' && password === 'user123')) {
+                    
+                    // Gebruiker opslaan in localStorage
+                    const userData = {
+                        username: username,
+                        email: username.includes('@') ? username : `${username}@brasseriebot.com`,
+                        role: username === 'admin' ? 'admin' : 'user',
+                        restaurantName: username === 'admin' ? 'Demo Restaurant' : 'Test Brasserie',
+                        lastLogin: new Date().toISOString()
+                    };
+                    
+                    localStorage.setItem('brasseriebot_user', JSON.stringify(userData));
+                    localStorage.setItem('brasseriebot_auth_time', Date.now().toString());
+                    
+                    // Doorsturen naar dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    // Toon foutmelding
+                    errorMessage.textContent = 'Ongeldige gebruikersnaam of wachtwoord. Probeer het opnieuw.';
+                    errorMessage.classList.add('show');
+                    document.getElementById('password').value = '';
+                }
+            }
         });
     </script>
 </body>
