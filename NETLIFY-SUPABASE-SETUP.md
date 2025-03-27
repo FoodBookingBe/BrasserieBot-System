@@ -4,7 +4,7 @@
 
 Je hebt de volgende Supabase gegevens nodig om de koppeling te configureren:
 
-1. **Supabase URL**: `https://yucpwawshjmonwsgvsfq.supabase.co`
+1. **Supabase Database URL**: `https://yucpwawshjmonwsgvsfq.supabase.co`
 2. **Supabase Anonymous Key**: Je anonieme API sleutel (deel deze niet in broncode)
 3. **Service Role Key**: Alleen nodig voor administratieve taken (deel deze NOOIT)
 
@@ -17,7 +17,7 @@ Je hebt de volgende Supabase gegevens nodig om de koppeling te configureren:
 
    | Sleutel | Waarde |
    |---------|--------|
-   | `SUPABASE_URL` | `https://yucpwawshjmonwsgvsfq.supabase.co` |
+   | `SUPABASE_DATABASE_URL` | `https://yucpwawshjmonwsgvsfq.supabase.co` |
    | `SUPABASE_ANON_KEY` | *Jouw Supabase anon key* |
 
 5. Klik op **Save** voor elke variabele
