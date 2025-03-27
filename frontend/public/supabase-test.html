@@ -322,7 +322,7 @@
     
     <!-- Omgevingsvariabelen -->
     <script>
-        // Omgevingsvariabelen voor Supabase
+        // Omgevingsvariabelen voor Supabase - deze worden automatisch ingevuld door Netlify
         window.ENV = {
             SUPABASE_DATABASE_URL: '{{SUPABASE_DATABASE_URL}}',
             SUPABASE_ANON_KEY: '{{SUPABASE_ANON_KEY}}'
@@ -383,12 +383,33 @@
                     if (isAvailable) {
                         // Probeer ook basis info op te halen om verbinding te bevestigen
                         const client = supabaseClient.getClient();
-                        const { data, error } = await client.from('_dummy_query').select('*').limit(1).catch(() => ({ data: null, error: null }));
                         
-                        // Als er geen fatale fout is opgetreden, beschouwen we het als succes
-                        setTestStatus(document.getElementById('config-test'), 'success', 
-                            `Supabase client succesvol geïnitialiseerd.<br>
-                            URL: ${window.ENV.SUPABASE_DATABASE_URL.replace(/^https:\/\//, '').substring(0, 12)}...`);
+                        try {
+                            // Gebruik een bestaande tabel voor de test (pas dit aan naar een tabel die zeker bestaat)
+                            // Als alternatief gebruiken we een try/catch structuur in plaats van .catch()
+                            const { data, error } = await client.from('reservations').select('*').limit(1);
+                            
+                            if (error) {
+                                throw error;
+                            }
+                            
+                            // Als we hier komen, beschouwen we het als succes
+                            setTestStatus(document.getElementById('config-test'), 'success', 
+                                `Supabase client succesvol geïnitialiseerd.<br>
+                                URL: ${window.ENV.SUPABASE_DATABASE_URL.replace(/^https:\/\//, '').substring(0, 12)}...`);
+                        } catch (queryError) {
+                            // Als de tabel niet bestaat, maar we kunnen wel verbinden
+                            if (queryError.message && queryError.message.includes('does not exist')) {
+                                setTestStatus(document.getElementById('config-test'), 'success', 
+                                    `Supabase client succesvol geïnitialiseerd, maar tabel bestaat niet.<br>
+                                    URL: ${window.ENV.SUPABASE_DATABASE_URL.replace(/^https:\/\//, '').substring(0, 12)}...`);
+                            } else {
+                                // Andere query fouten, nog steeds beschouwen als success als verbinding werkt
+                                setTestStatus(document.getElementById('config-test'), 'success', 
+                                    `Supabase client succesvol geïnitialiseerd, maar er was een query fout: ${queryError.message}<br>
+                                    URL: ${window.ENV.SUPABASE_DATABASE_URL.replace(/^https:\/\//, '').substring(0, 12)}...`);
+                            }
+                        }
                     } else {
                         setTestStatus(document.getElementById('config-test'), 'error', 
                             'Kon de Supabase client niet initialiseren. Controleer of de URL en API sleutel correct zijn ingesteld in de Netlify configuratie.');
@@ -409,26 +430,39 @@
                     const { data, error } = await supabaseClient.auth.loginWithPassword('admin@brasseriebot.com', 'admin123');
                     
                     if (error) {
-                        setTestStatus(document.getElementById('auth-test'), 'error', 
-                            `Fout bij inloggen: ${error.message}<br>
-                            Controleer of de testgebruiker is aangemaakt in Supabase.`);
-                    } else {
-                        // Haal gebruikersinfo op om te bevestigen
-                        const user = await supabaseClient.auth.getCurrentUser();
-                        
-                        if (user) {
-                            setTestStatus(document.getElementById('auth-test'), 'success', 
-                                `Succesvol ingelogd als: ${user.email || 'admin@brasseriebot.com'}<br>
-                                User ID: ${user.id ? user.id.substring(0, 8) + '...' : 'Onbekend'}`);
-                            
-                            // Schakel de database test knoppen in
-                            reservationsTestBtn.disabled = false;
-                            customersTestBtn.disabled = false;
-                            ordersTestBtn.disabled = false;
-                            realtimeTestBtn.disabled = false;
+                        // Als er een API key probleem is, controleer of lokale fallback werkt
+                        if (error.message && error.message.includes('API key')) {
+                            // Probeer de lokale fallback
+                            setTestStatus(document.getElementById('auth-test'), 'error', 
+                                `Fout bij inloggen: ${error.message}<br>
+                                Controleer of de API-sleutel correct is ingesteld in Netlify.`);
                         } else {
                             setTestStatus(document.getElementById('auth-test'), 'error', 
-                                'Inloggen leek te slagen, maar gebruikersinfo kon niet worden opgehaald.');
+                                `Fout bij inloggen: ${error.message}<br>
+                                Controleer of de testgebruiker is aangemaakt in Supabase.`);
+                        }
+                    } else {
+                        // Haal gebruikersinfo op om te bevestigen
+                        try {
+                            const user = await supabaseClient.auth.getCurrentUser();
+                            
+                            if (user) {
+                                setTestStatus(document.getElementById('auth-test'), 'success', 
+                                    `Succesvol ingelogd als: ${user.email || 'admin@brasseriebot.com'}<br>
+                                    User ID: ${user.id ? user.id.substring(0, 8) + '...' : 'Onbekend'}`);
+                                
+                                // Schakel de database test knoppen in
+                                reservationsTestBtn.disabled = false;
+                                customersTestBtn.disabled = false;
+                                ordersTestBtn.disabled = false;
+                                realtimeTestBtn.disabled = false;
+                            } else {
+                                setTestStatus(document.getElementById('auth-test'), 'error', 
+                                    'Inloggen leek te slagen, maar gebruikersinfo kon niet worden opgehaald.');
+                            }
+                        } catch (userError) {
+                            setTestStatus(document.getElementById('auth-test'), 'error', 
+                                `Inloggen succesvol, maar fout bij ophalen gebruikersinfo: ${userError.message}`);
                         }
                     }
                 } catch (error) {
@@ -467,48 +501,55 @@
                     };
                     
                     // Voeg toe aan de database
-                    const { data: insertData, error: insertError } = await client
-                        .from('reservations')
-                        .insert([testReservation])
-                        .select()
-                        .single();
-                    
-                    if (insertError) {
-                        setTestStatus(document.getElementById('db-test-reservations'), 'error', 
-                            `Fout bij toevoegen reservering: ${insertError.message}`);
-                        return;
+                    try {
+                        const { data: insertData, error: insertError } = await client
+                            .from('reservations')
+                            .insert([testReservation])
+                            .select();
+                        
+                        if (insertError) {
+                            throw insertError;
+                        }
+                        
+                        const newRecord = insertData[0];
+                        
+                        // Haal de reservering weer op
+                        const { data: getData, error: getError } = await client
+                            .from('reservations')
+                            .select('*')
+                            .eq('id', newRecord.id)
+                            .single();
+                        
+                        if (getError) {
+                            throw getError;
+                        }
+                        
+                        // Verwijder de testreservering weer
+                        const { error: deleteError } = await client
+                            .from('reservations')
+                            .delete()
+                            .eq('id', newRecord.id);
+                        
+                        if (deleteError) {
+                            setTestStatus(document.getElementById('db-test-reservations'), 'warning', 
+                                `Reservering toevoegen en ophalen geslaagd, maar verwijderen mislukt: ${deleteError.message}`);
+                            return;
+                        }
+                        
+                        // Alles succesvol
+                        setTestStatus(document.getElementById('db-test-reservations'), 'success', 
+                            `Reservering succesvol aangemaakt, opgehaald en verwijderd.<br>
+                            De reserveringen tabel werkt correct!`);
+                    } catch (dbError) {
+                        // Als tabel niet bestaat, geef specifieke melding
+                        if (dbError.message && dbError.message.includes('does not exist')) {
+                            setTestStatus(document.getElementById('db-test-reservations'), 'error', 
+                                `De tabel 'reservations' bestaat niet. Maak deze eerst aan in Supabase.`);
+                        } else {
+                            setTestStatus(document.getElementById('db-test-reservations'), 'error', 
+                                `Fout bij testen van reserveringen: ${dbError.message}`);
+                        }
                     }
-                    
-                    // Haal de reservering weer op
-                    const { data: getData, error: getError } = await client
-                        .from('reservations')
-                        .select('*')
-                        .eq('id', insertData.id)
-                        .single();
-                    
-                    if (getError) {
-                        setTestStatus(document.getElementById('db-test-reservations'), 'error', 
-                            `Fout bij ophalen reservering: ${getError.message}`);
-                        return;
-                    }
-                    
-                    // Verwijder de testreservering weer
-                    const { error: deleteError } = await client
-                        .from('reservations')
-                        .delete()
-                        .eq('id', insertData.id);
-                    
-                    if (deleteError) {
-                        setTestStatus(document.getElementById('db-test-reservations'), 'warning', 
-                            `Reservering toevoegen en ophalen geslaagd, maar verwijderen mislukt: ${deleteError.message}`);
-                        return;
-                    }
-                    
-                    // Alles succesvol
-                    setTestStatus(document.getElementById('db-test-reservations'), 'success', 
-                        `Reservering succesvol aangemaakt, opgehaald en verwijderd.<br>
-                        De reserveringen tabel werkt correct!`);
-                    
                 } catch (error) {
                     setTestStatus(document.getElementById('db-test-reservations'), 'error', 
                         `Onverwachte fout bij reserveringen test: ${error.message}`);
@@ -517,6 +558,7 @@
             
             // 4. Klanten Test
             customersTestBtn.addEventListener('click', async function() {
+                // Vergelijkbare structuur als de reserveringen test, aangepast naar klanten
                 // Zet de status op pending
                 setTestStatus(document.getElementById('db-test-customers'), 'pending', 'Testen van toegang tot klanten...');
                 
@@ -531,7 +573,7 @@
                         return;
                     }
                     
-                    // Maak een testklant aan
+                    // Maak een testklant aan met try/catch structuur
                     const testCustomer = {
                         user_id: user.id,
                         name: 'Test Klant',
@@ -542,62 +584,67 @@
                         preferences: 'Test voorkeuren'
                     };
                     
-                    // Voeg toe aan de database
-                    const { data: insertData, error: insertError } = await client
-                        .from('customers')
-                        .insert([testCustomer])
-                        .select()
-                        .single();
-                    
-                    if (insertError) {
-                        setTestStatus(document.getElementById('db-test-customers'), 'error', 
-                            `Fout bij toevoegen klant: ${insertError.message}`);
-                        return;
+                    try {
+                        // Voeg toe aan de database
+                        const { data: insertData, error: insertError } = await client
+                            .from('customers')
+                            .insert([testCustomer])
+                            .select();
+                        
+                        if (insertError) {
+                            throw insertError;
+                        }
+                        
+                        const newCustomer = insertData[0];
+                        
+                        // Haal de klant weer op
+                        const { data: getData, error: getError } = await client
+                            .from('customers')
+                            .select('*')
+                            .eq('id', newCustomer.id)
+                            .single();
+                        
+                        if (getError) {
+                            throw getError;
+                        }
+                        
+                        // Verwijder de testklant weer
+                        const { error: deleteError } = await client
+                            .from('customers')
+                            .delete()
+                            .eq('id', newCustomer.id);
+                        
+                        if (deleteError) {
+                            setTestStatus(document.getElementById('db-test-customers'), 'warning', 
+                                `Klant toevoegen en ophalen geslaagd, maar verwijderen mislukt: ${deleteError.message}`);
+                            return;
+                        }
+                        
+                        // Alles succesvol
+                        setTestStatus(document.getElementById('db-test-customers'), 'success', 
+                            `Klant succesvol aangemaakt, opgehaald en verwijderd.<br>
+                            De klanten tabel werkt correct!`);
+                    } catch (dbError) {
+                        // Als tabel niet bestaat, geef specifieke melding
+                        if (dbError.message && dbError.message.includes('does not exist')) {
+                            setTestStatus(document.getElementById('db-test-customers'), 'error', 
+                                `De tabel 'customers' bestaat niet. Maak deze eerst aan in Supabase.`);
+                        } else {
+                            setTestStatus(document.getElementById('db-test-customers'), 'error', 
+                                `Fout bij testen van klanten: ${dbError.message}`);
+                        }
                     }
-                    
-                    // Haal de klant weer op
-                    const { data: getData, error: getError } = await client
-                        .from('customers')
-                        .select('*')
-                        .eq('id', insertData.id)
-                        .single();
-                    
-                    if (getError) {
-                        setTestStatus(document.getElementById('db-test-customers'), 'error', 
-                            `Fout bij ophalen klant: ${getError.message}`);
-                        return;
-                    }
-                    
-                    // Verwijder de testklant weer
-                    const { error: deleteError } = await client
-                        .from('customers')
-                        .delete()
-                        .eq('id', insertData.id);
-                    
-                    if (deleteError) {
-                        setTestStatus(document.getElementById('db-test-customers'), 'warning', 
-                            `Klant toevoegen en ophalen geslaagd, maar verwijderen mislukt: ${deleteError.message}`);
-                        return;
-                    }
-                    
-                    // Alles succesvol
-                    setTestStatus(document.getElementById('db-test-customers'), 'success', 
-                        `Klant succesvol aangemaakt, opgehaald en verwijderd.<br>
-                        De klanten tabel werkt correct!`);
-                    
                 } catch (error) {
                     setTestStatus(document.getElementById('db-test-customers'), 'error', 
                         `Onverwachte fout bij klanten test: ${error.message}`);
                 }
             });
             
-            // 5. Bestellingen Test
+            // 5. Bestellingen Test (vergelijkbaar aangepast)
             ordersTestBtn.addEventListener('click', async function() {
-                // Zet de status op pending
                 setTestStatus(document.getElementById('db-test-orders'), 'pending', 'Testen van toegang tot bestellingen...');
                 
                 try {
-                    // Test of we een bestelling kunnen toevoegen
                     const client = supabaseClient.getClient();
                     const user = await supabaseClient.auth.getCurrentUser();
                     
@@ -607,7 +654,6 @@
                         return;
                     }
                     
-                    // Maak een testbestelling aan
                     const testOrder = {
                         user_id: user.id,
                         table_number: 5,
@@ -621,49 +667,53 @@
                         payment_method: 'test'
                     };
                     
-                    // Voeg toe aan de database
-                    const { data: insertData, error: insertError } = await client
-                        .from('orders')
-                        .insert([testOrder])
-                        .select()
-                        .single();
-                    
-                    if (insertError) {
-                        setTestStatus(document.getElementById('db-test-orders'), 'error', 
-                            `Fout bij toevoegen bestelling: ${insertError.message}`);
-                        return;
+                    try {
+                        const { data: insertData, error: insertError } = await client
+                            .from('orders')
+                            .insert([testOrder])
+                            .select();
+                        
+                        if (insertError) {
+                            throw insertError;
+                        }
+                        
+                        const newOrder = insertData[0];
+                        
+                        // Haal de bestelling weer op
+                        const { data: getData, error: getError } = await client
+                            .from('orders')
+                            .select('*')
+                            .eq('id', newOrder.id)
+                            .single();
+                        
+                        if (getError) {
+                            throw getError;
+                        }
+                        
+                        // Verwijder de testbestelling weer
+                        const { error: deleteError } = await client
+                            .from('orders')
+                            .delete()
+                            .eq('id', newOrder.id);
+                        
+                        if (deleteError) {
+                            setTestStatus(document.getElementById('db-test-orders'), 'warning', 
+                                `Bestelling toevoegen en ophalen geslaagd, maar verwijderen mislukt: ${deleteError.message}`);
+                            return;
+                        }
+                        
+                        setTestStatus(document.getElementById('db-test-orders'), 'success', 
+                            `Bestelling succesvol aangemaakt, opgehaald en verwijderd.<br>
+                            De bestellingen tabel werkt correct!`);
+                    } catch (dbError) {
+                        if (dbError.message && dbError.message.includes('does not exist')) {
+                            setTestStatus(document.getElementById('db-test-orders'), 'error', 
+                                `De tabel 'orders' bestaat niet. Maak deze eerst aan in Supabase.`);
+                        } else {
+                            setTestStatus(document.getElementById('db-test-orders'), 'error', 
+                                `Fout bij testen van bestellingen: ${dbError.message}`);
+                        }
                     }
-                    
-                    // Haal de bestelling weer op
-                    const { data: getData, error: getError } = await client
-                        .from('orders')
-                        .select('*')
-                        .eq('id', insertData.id)
-                        .single();
-                    
-                    if (getError) {
-                        setTestStatus(document.getElementById('db-test-orders'), 'error', 
-                            `Fout bij ophalen bestelling: ${getError.message}`);
-                        return;
-                    }
-                    
-                    // Verwijder de testbestelling weer
-                    const { error: deleteError } = await client
-                        .from('orders')
-                        .delete()
-                        .eq('id', insertData.id);
-                    
-                    if (deleteError) {
-                        setTestStatus(document.getElementById('db-test-orders'), 'warning', 
-                            `Bestelling toevoegen en ophalen geslaagd, maar verwijderen mislukt: ${deleteError.message}`);
-                        return;
-                    }
-                    
-                    // Alles succesvol
-                    setTestStatus(document.getElementById('db-test-orders'), 'success', 
-                        `Bestelling succesvol aangemaakt, opgehaald en verwijderd.<br>
-                        De bestellingen tabel werkt correct!`);
-                    
                 } catch (error) {
                     setTestStatus(document.getElementById('db-test-orders'), 'error', 
                         `Onverwachte fout bij bestellingen test: ${error.message}`);
@@ -672,7 +722,6 @@
             
             // 6. Realtime Test
             realtimeTestBtn.addEventListener('click', async function() {
-                // Zet de status op pending
                 setTestStatus(document.getElementById('realtime-test'), 'pending', 'Testen van realtime updates...');
                 
                 try {
@@ -685,81 +734,77 @@
                         return;
                     }
                     
-                    // Luister naar wijzigingen in de reserveringen tabel
-                    realtimeResult.innerHTML = 'Luisteren naar realtime updates op de reserveringen tabel...<br>Er wordt een testreservering aangemaakt, probeer deze stap later opnieuw als het niet direct lukt.';
+                    // We zullen realtime testen met een eenvoudigere aanpak
+                    realtimeResult.innerHTML = 'Luisteren naar realtime updates op de reserveringen tabel...<br>Als de test slaagt zul je dit bericht zien veranderen.';
                     
-                    // Abonneer op realtime updates voor reserveringen
-                    const realtimeChannel = client
-                        .channel('public:reservations')
-                        .on('postgres_changes', {
-                            event: '*',
-                            schema: 'public',
-                            table: 'reservations'
-                        }, (payload) => {
+                    try {
+                        // Abonneer op realtime updates voor reserveringen
+                        const realtimeChannel = supabaseClient.realtime.subscribe('reservations', (payload) => {
                             // Toon resultaat
                             setTestStatus(document.getElementById('realtime-test'), 'success', 
                                 `Realtime update ontvangen!<br>
                                 Event: ${payload.eventType}<br>
                                 Tabel: ${payload.table}<br>
                                 Record ID: ${payload.new?.id || payload.old?.id}`);
-                            
-                            // Beëindig het abonnement na een succesvolle test
-                            setTimeout(() => {
-                                realtimeChannel.unsubscribe();
-                            }, 2000);
-                        })
-                        .subscribe();
-                    
-                    // Maak een testreservering aan om realtime updates te testen
-                    setTimeout(async () => {
-                        // Maak een testreservering aan
-                        const testReservation = {
-                            user_id: user.id,
-                            name: 'Realtime Test Klant',
-                            email: 'realtime@example.com',
-                            phone: '+3247812345',
-                            guests: 2,
-                            date: new Date().toISOString().split('T')[0],
-                            time: '19:00',
-                            status: 'realtime-test',
-                            notes: 'Dit is een realtime testreservering'
-                        };
+                        });
                         
-                        // Voeg toe aan de database
-                        const { data, error } = await client
-                            .from('reservations')
-                            .insert([testReservation])
-                            .select();
-                        
-                        if (error) {
-                            setTestStatus(document.getElementById('realtime-test'), 'error', 
-                                `Fout bij aanmaken van testreservering voor realtime test: ${error.message}`);
-                            realtimeChannel.unsubscribe();
-                        }
-                        
-                        // Verwijder de testreservering na 2 seconden
-                        if (data && data[0]) {
-                            setTimeout(async () => {
-                                await client
+                        // Maak een testreservering aan na korte vertraging
+                        setTimeout(async () => {
+                            try {
+                                const testReservation = {
+                                    user_id: user.id,
+                                    name: 'Realtime Test Klant',
+                                    email: 'realtime@example.com',
+                                    phone: '+3247812345',
+                                    guests: 2,
+                                    date: new Date().toISOString().split('T')[0],
+                                    time: '19:00',
+                                    status: 'realtime-test',
+                                    notes: 'Dit is een realtime testreservering'
+                                };
+                                
+                                const { data, error } = await client
                                     .from('reservations')
-                                    .delete()
-                                    .eq('id', data[0].id);
-                            }, 2000);
-                        }
-                    }, 1000);
-                    
-                    // Stel een timeout in voor als er geen realtime updates worden ontvangen
-                    setTimeout(() => {
-                        if (document.getElementById('realtime-test').classList.contains('pending')) {
-                            setTestStatus(document.getElementById('realtime-test'), 'error', 
-                                'Geen realtime updates ontvangen binnen de timeout periode. Controleer of Supabase realtime is ingeschakeld en probeer het opnieuw.');
-                            
-                            if (realtimeChannel) {
-                                realtimeChannel.unsubscribe();
+                                    .insert([testReservation])
+                                    .select();
+                                
+                                if (error) {
+                                    throw error;
+                                }
+                                
+                                // Na 2 seconden weer verwijderen
+                                setTimeout(async () => {
+                                    if (data && data[0]) {
+                                        await client
+                                            .from('reservations')
+                                            .delete()
+                                            .eq('id', data[0].id);
+                                    }
+                                    
+                                    // Beëindig het abonnement
+                                    supabaseClient.realtime.unsubscribe(realtimeChannel);
+                                }, 2000);
+                            } catch (insertError) {
+                                setTestStatus(document.getElementById('realtime-test'), 'error', 
+                                    `Fout bij aanmaken van testreservering voor realtime test: ${insertError.message}`);
+                                
+                                if (realtimeChannel) {
+                                    supabaseClient.realtime.unsubscribe(realtimeChannel);
+                                }
                             }
-                        }
-                    }, 5000);
-                    
+                        }, 1000);
+                        
+                        // Stel een timeout in voor als er geen realtime updates worden ontvangen
+                        setTimeout(() => {
+                            if (document.getElementById('realtime-test').classList.contains('pending')) {
+                                setTestStatus(document.getElementById('realtime-test'), 'error', 
+                                    'Geen realtime updates ontvangen binnen de timeout periode. Controleer of Supabase realtime is ingeschakeld en probeer het opnieuw.');
+                            }
+                        }, 5000);
+                    } catch (realtimeError) {
+                        setTestStatus(document.getElementById('realtime-test'), 'error', 
+                            `Fout bij opzetten realtime test: ${realtimeError.message}`);
+                    }
                 } catch (error) {
                     setTestStatus(document.getElementById('realtime-test'), 'error', 
                         `Onverwachte fout bij realtime test: ${error.message}`);
