@@ -1,8 +1,24 @@
 [build]
   # Publish the frontend/public directory directly
   publish = "frontend/public"
-  # No build command needed for static files
-  command = "echo 'No build command needed for static files'"
+  # Process HTML files to inject environment variables
+  command = "node frontend/public/process-html.js"
+
+# Configuratie voor Netlify plaatshoudervervanging
+[context.production]
+  [context.production.environment]
+    SUPABASE_URL = "from_netlify_ui"
+    SUPABASE_ANON_KEY = "from_netlify_ui"
+
+[context.deploy-preview]
+  [context.deploy-preview.environment]
+    SUPABASE_URL = "from_netlify_ui"
+    SUPABASE_ANON_KEY = "from_netlify_ui"
+
+[context.branch-deploy]
+  [context.branch-deploy.environment]
+    SUPABASE_URL = "from_netlify_ui"
+    SUPABASE_ANON_KEY = "from_netlify_ui"
 
 # Redirects for direct access to dashboard
 [[redirects]]

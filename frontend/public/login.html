@@ -161,20 +161,46 @@
         </div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Omgevingsvariabelen voor Supabase - deze worden automatisch ingevuld door Netlify
+        window.ENV = {
+            SUPABASE_URL: '{{SUPABASE_URL}}',
+            SUPABASE_KEY: '{{SUPABASE_ANON_KEY}}'
+        };
+    </script>
+    <script src="supabase-client.js"></script>
     <script src="accessibility.js"></script>
     <script>
         // Initialisatie
         document.addEventListener('DOMContentLoaded', function() {
-            // Check of gebruiker al is ingelogd
-            const userJson = localStorage.getItem('brasseriebot_user');
-            const authTime = localStorage.getItem('brasseriebot_auth_time');
+            // Controleer of Supabase client beschikbaar is
+            const isSupabaseAvailable = typeof supabaseClient !== 'undefined' && supabaseClient.isAvailable();
             
-            // Als er een gebruiker is én de sessie niet verlopen is (24 uur)
-            if (userJson && authTime && (Date.now() - parseInt(authTime)) < 24 * 60 * 60 * 1000) {
-                // Doorsturen naar dashboard
-                window.location.href = 'dashboard.html';
-                return;
-            }
+            // Check of gebruiker al is ingelogd (via Supabase of localStorage)
+            const checkAuthState = async () => {
+                if (isSupabaseAvailable) {
+                    // Probeer eerst Supabase sessie
+                    const user = await supabaseClient.auth.getCurrentUser();
+                    if (user) {
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+                } else {
+                    // Fallback naar localStorage voor backwards compatibiliteit
+                    const userJson = localStorage.getItem('brasseriebot_user');
+                    const authTime = localStorage.getItem('brasseriebot_auth_time');
+                    
+                    // Als er een gebruiker is én de sessie niet verlopen is (24 uur)
+                    if (userJson && authTime && (Date.now() - parseInt(authTime)) < 24 * 60 * 60 * 1000) {
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+                }
+            };
+            
+            // Controleer authenticatie
+            checkAuthState();
             
             // Login formulier event listeners
             const loginForm = document.getElementById('login-form');
@@ -193,28 +219,55 @@
                     return;
                 }
                 
-                // Demo login (In productie vervangen door echte API call)
-                if ((username === 'admin' && password === 'admin123') || 
-                    (username === 'user' && password === 'user123')) {
+                // Maak een email adres van de gebruikersnaam als het nog geen email is
+                const email = username.includes('@') ? username : `${username}@brasseriebot.com`;
+                
+                if (isSupabaseAvailable) {
+                    // Login via Supabase
+                    errorMessage.classList.remove('show');
                     
-                    // Gebruiker opslaan in localStorage
-                    const userData = {
-                        username: username,
-                        role: username === 'admin' ? 'admin' : 'user',
-                        restaurantName: username === 'admin' ? 'Demo Restaurant' : 'Test Brasserie',
-                        lastLogin: new Date().toISOString()
-                    };
-                    
-                    localStorage.setItem('brasseriebot_user', JSON.stringify(userData));
-                    localStorage.setItem('brasseriebot_auth_time', Date.now().toString());
-                    
-                    // Doorsturen naar dashboard
-                    window.location.href = 'dashboard.html';
+                    try {
+                        const { data, error } = await supabaseClient.auth.loginWithPassword(email, password);
+                        
+                        if (error) {
+                            // Toon foutmelding
+                            errorMessage.textContent = error.message || 'Ongeldige inloggegevens. Probeer het opnieuw.';
+                            errorMessage.classList.add('show');
+                            document.getElementById('password').value = '';
+                        } else {
+                            // Succes - doorsturen naar dashboard
+                            window.location.href = 'dashboard.html';
+                        }
+                    } catch (err) {
+                        console.error('Login fout:', err);
+                        errorMessage.textContent = 'Er is een fout opgetreden. Probeer het later opnieuw.';
+                        errorMessage.classList.add('show');
+                    }
                 } else {
-                    // Toon foutmelding
-                    errorMessage.textContent = 'Ongeldige gebruikersnaam of wachtwoord. Probeer het opnieuw.';
-                    errorMessage.classList.add('show');
-                    document.getElementById('password').value = '';
+                    // Fallback voor demo/ontwikkeling wanneer Supabase niet beschikbaar is
+                    if ((username === 'admin' && password === 'admin123') ||
+                        (username === 'user' && password === 'user123')) {
+                        
+                        // Gebruiker opslaan in localStorage
+                        const userData = {
+                            username: username,
+                            email: email,
+                            role: username === 'admin' ? 'admin' : 'user',
+                            restaurantName: username === 'admin' ? 'Demo Restaurant' : 'Test Brasserie',
+                            lastLogin: new Date().toISOString()
+                        };
+                        
+                        localStorage.setItem('brasseriebot_user', JSON.stringify(userData));
+                        localStorage.setItem('brasseriebot_auth_time', Date.now().toString());
+                        
+                        // Doorsturen naar dashboard
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        // Toon foutmelding
+                        errorMessage.textContent = 'Ongeldige gebruikersnaam of wachtwoord. Probeer het opnieuw.';
+                        errorMessage.classList.add('show');
+                        document.getElementById('password').value = '';
+                    }
                 }
             });
         });

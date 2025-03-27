@@ -1,0 +1,17 @@
+{
+  "name": "brasseriebot-system",
+  "version": "1.0.0",
+  "description": "BrasserieBot Restaurant Management System",
+  "type": "module",
+  "scripts": {
+    "start": "cd frontend/public && npx serve",
+    "build": "node frontend/public/process-html.js",
+    "deploy": "netlify deploy --prod"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

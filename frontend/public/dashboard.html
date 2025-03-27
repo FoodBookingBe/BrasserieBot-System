@@ -653,6 +653,15 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Omgevingsvariabelen voor Supabase - deze worden automatisch ingevuld door Netlify
+        window.ENV = {
+            SUPABASE_URL: '{{SUPABASE_URL}}',
+            SUPABASE_KEY: '{{SUPABASE_ANON_KEY}}'
+        };
+    </script>
+    <script src="supabase-client.js"></script>
     <script src="api-client.js"></script>
     <script src="dashboard-data.js"></script>
     <script src="accessibility.js"></script>
