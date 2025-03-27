@@ -12,7 +12,7 @@ const directoryPath = './frontend/public';
 
 // Variabelen die vervangen moeten worden
 const variables = {
-    'SUPABASE_URL': process.env.SUPABASE_URL || '',
+    'SUPABASE_DATABASE_URL': process.env.SUPABASE_DATABASE_URL || '',
     'SUPABASE_ANON_KEY': process.env.SUPABASE_ANON_KEY || ''
 };
 
