@@ -3,155 +3,393 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrasserieBot Mobile Guide</title>
+    <title>BrasserieBot Mobiele Gebruikersgids</title>
     <link rel="stylesheet" href="styles-combined.css">
     <link rel="stylesheet" href="responsive.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.363.0/dist/umd/lucide.min.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f5f7fa;
-            padding: 20px;
-            max-width: 800px;
+        /* Speciale stijlen voor de mobiele gids */
+        .guide-container {
+            max-width: 1000px;
             margin: 0 auto;
+            padding: 20px;
         }
         
-        .container {
+        .guide-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .guide-header h1 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        
+        .guide-header p {
+            color: #64748b;
+            font-size: 18px;
+        }
+        
+        .guide-section {
+            margin-bottom: 40px;
+            border-radius: 12px;
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            margin-bottom: 30px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         }
         
-        h1 {
-            color: #0066cc;
+        .guide-section h2 {
+            color: #1e293b;
             margin-bottom: 20px;
-            font-size: 1.8rem;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
         }
         
-        h2 {
-            color: #0066cc;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            font-size: 1.4rem;
+        .guide-section h3 {
+            color: #334155;
+            margin: 20px 0 10px;
         }
         
-        p {
+        .guide-section p {
             margin-bottom: 15px;
+            line-height: 1.6;
         }
         
         .screenshot {
+            display: block;
             max-width: 100%;
             height: auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin: 15px 0;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
         
-        .feature {
+        .tip-box {
+            background-color: #f8fafc;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        
+        .tip-box h4 {
+            margin-top: 0;
+            color: #0066cc;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tip-box h4 i {
+            margin-right: 8px;
+        }
+        
+        .gesture-item {
+            display: flex;
+            align-items: flex-start;
             margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
         }
         
-        .feature:last-child {
-            border-bottom: none;
+        .gesture-icon {
+            flex: 0 0 50px;
+            height: 50px;
+            background-color: #e2f1fe;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
         }
         
-        .button {
-            display: inline-block;
+        .gesture-icon i {
+            color: #0066cc;
+            font-size: 24px;
+        }
+        
+        .gesture-content {
+            flex: 1;
+        }
+        
+        .gesture-content h4 {
+            margin: 0 0 5px;
+            color: #334155;
+        }
+        
+        .gesture-content p {
+            margin: 0;
+            color: #64748b;
+        }
+        
+        .back-to-dashboard {
+            display: inline-flex;
+            align-items: center;
             background-color: #0066cc;
             color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 10px 16px;
+            border-radius: 6px;
             text-decoration: none;
-            margin-top: 10px;
             font-weight: 500;
+            margin-top: 20px;
+            transition: background-color 0.2s;
         }
         
-        .button:hover {
+        .back-to-dashboard:hover {
             background-color: #0052a3;
         }
         
-        code {
-            background-color: #f5f5f5;
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9em;
+        .back-to-dashboard i {
+            margin-right: 8px;
         }
         
-        .note {
-            background-color: #fff8e6;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 4px;
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
+        @media (max-width: 768px) {
+            .guide-section {
+                padding: 20px 15px;
             }
             
-            h1 {
-                font-size: 1.6rem;
+            .gesture-item {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
             }
             
-            h2 {
-                font-size: 1.3rem;
+            .gesture-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>BrasserieBot Mobiele Versie</h1>
-        
-        <div class="feature">
-            <h2>Mobielvriendelijke Interface</h2>
-            <p>De BrasserieBot website is nu volledig aangepast voor gebruik op mobiele apparaten. De interface schaalt automatisch naar verschillende schermformaten, van desktops tot smartphones.</p>
+    <div class="guide-container">
+        <div class="guide-header">
+            <h1>BrasserieBot Mobiele Gebruikersgids</h1>
+            <p>Optimaal gebruik van uw BrasserieBot Restaurant Management System op mobiele apparaten</p>
         </div>
         
-        <div class="feature">
-            <h2>Mobiele Navigatie</h2>
-            <p>Op mobiele apparaten is de navigatie aangepast:</p>
-            <ul>
-                <li>Tik op het <strong>menu-icoon</strong> linksboven om het zijmenu te openen</li>
-                <li>Tik op het <strong>zoek-icoon</strong> rechtsboven om de zoekfunctie te gebruiken</li>
-                <li>Het menu sluit automatisch wanneer u een sectie selecteert</li>
-            </ul>
+        <div class="guide-section">
+            <h2>Inleiding</h2>
+            <p>
+                BrasserieBot is volledig geoptimaliseerd voor gebruik op mobiele apparaten. Met een responsief ontwerp zorgt het platform ervoor dat 
+                u alle functionaliteiten kunt gebruiken, ongeacht of u achter uw computer zit, of onderweg bent met uw smartphone of tablet. 
+                Deze gids zal u helpen om optimaal gebruik te maken van de mobiele versie van het BrasserieBot platform.
+            </p>
+            
+            <div class="tip-box">
+                <h4><i data-lucide="lightbulb"></i> Tip</h4>
+                <p>Voor de beste ervaring raden we aan BrasserieBot toe te voegen aan uw startscherm. Zo krijgt u een app-achtige ervaring zonder een aparte app te downloaden.</p>
+            </div>
         </div>
         
-        <div class="feature">
-            <h2>Responsieve Layouts</h2>
-            <p>Alle pagina's passen zich aan voor optimale leesbaarheid:</p>
-            <ul>
-                <li>Statistieken worden verticaal gestapeld op kleinere schermen</li>
-                <li>Tabellen zijn horizontaal scrollbaar om alle gegevens te bekijken</li>
-                <li>Formulieren en knoppen schalen naar de beschikbare ruimte</li>
-            </ul>
+        <div class="guide-section">
+            <h2>Navigatie</h2>
+            <p>
+                Op mobiele apparaten is de navigatie aangepast voor eenvoudig gebruik met één hand. Het zijmenu is standaard verborgen om meer ruimte te bieden voor uw content.
+            </p>
+            
+            <h3>Zijmenu openen</h3>
+            <p>
+                Tik op het menu-icoon <i data-lucide="menu"></i> in de linkerbovenhoek om het zijmenu te openen. Hierin vindt u alle hoofdmodules van BrasserieBot.
+            </p>
+            
+            <h3>Snel zoeken</h3>
+            <p>
+                Tik op het zoek-icoon <i data-lucide="search"></i> in de rechterbovenhoek om snel door uw gegevens te zoeken. De zoekfunctie is geoptimaliseerd voor touch-input.
+            </p>
+            
+            <div class="gesture-item">
+                <div class="gesture-icon">
+                    <i data-lucide="swipe"></i>
+                </div>
+                <div class="gesture-content">
+                    <h4>Veeg vanaf de linkerrand</h4>
+                    <p>Op sommige apparaten kunt u ook vanaf de linkerrand naar rechts vegen om het zijmenu te openen.</p>
+                </div>
+            </div>
+            
+            <div class="gesture-item">
+                <div class="gesture-icon">
+                    <i data-lucide="mouse-pointer-click"></i>
+                </div>
+                <div class="gesture-content">
+                    <h4>Tik buiten het menu</h4>
+                    <p>Om het zijmenu te sluiten, tikt u simpelweg buiten het menu op de donkere overlay.</p>
+                </div>
+            </div>
         </div>
         
-        <div class="note">
-            <p><strong>Tip:</strong> Voor de beste ervaring, draai uw apparaat horizontaal bij het werken met datatabellen of grafieken voor een beter overzicht.</p>
+        <div class="guide-section">
+            <h2>Reserveringen beheren</h2>
+            <p>
+                De reserveringsmodule is speciaal geoptimaliseerd voor mobiel gebruik, zodat u zelfs tijdens drukke periodes snel reserveringen kunt toevoegen of bewerken.
+            </p>
+            
+            <h3>Nieuwe reservering toevoegen</h3>
+            <p>
+                1. Navigeer naar "Reservatiebeheer" via het zijmenu<br>
+                2. Tik op de "+ Nieuwe reservering" knop bovenaan<br>
+                3. Vul het reserveringsformulier in - alle velden zijn geoptimaliseerd voor mobiele invoer<br>
+                4. De datumkiezer en tijdselectie zijn aangepast voor eenvoudige touch-bediening
+            </p>
+            
+            <h3>Inkomende reserveringen bekijken</h3>
+            <p>
+                Op mobiele apparaten worden reserveringen weergegeven in een geoptimaliseerde lijst, waarbij de meest relevante informatie direct zichtbaar is.
+                Voor meer gedetailleerde informatie kunt u op een reservering tikken.
+            </p>
+            
+            <div class="tip-box">
+                <h4><i data-lucide="lightbulb"></i> Tip</h4>
+                <p>Gebruik de dag-selector bovenaan het scherm om snel tussen verschillende dagen te schakelen. Veeg horizontaal over deze selector om meer dagen te zien.</p>
+            </div>
         </div>
         
-        <p><a href="login.html" class="button">Ga naar Login</a></p>
+        <div class="guide-section">
+            <h2>Menu en voorraad beheren</h2>
+            <p>
+                Met de mobiele interface kunt u eenvoudig uw menu en voorraad bijhouden, zelfs als u in de keuken of elders in uw restaurant bent.
+            </p>
+            
+            <h3>Menu-items bewerken</h3>
+            <p>
+                De menu-editor is volledig aanpasbaar op mobiele apparaten. Tik op een menu-item om het te bewerken, of gebruik de snelle actieknoppen om een item beschikbaar of niet-beschikbaar te maken.
+            </p>
+            
+            <h3>Voorraad bijwerken</h3>
+            <p>
+                De voorraadmodule is geoptimaliseerd voor snelle updates:
+            </p>
+            <p>
+                1. Navigeer naar "Voorraad & Inkoop" via het zijmenu<br>
+                2. Gebruik de filteropties om snel producten te vinden<br>
+                3. Tik op "+" of "-" naast een item om de voorraad aan te passen<br>
+                4. Voor grotere aanpassingen tikt u op het item om het bewerkingsformulier te openen
+            </p>
+        </div>
+        
+        <div class="guide-section">
+            <h2>Bestellingen en betalingen</h2>
+            <p>
+                Het afhandelen van bestellingen en betalingen is eenvoudig op mobiele apparaten, zodat u flexibel kunt werken.
+            </p>
+            
+            <h3>Bestellingsstatus bijwerken</h3>
+            <p>
+                1. Tik op een bestelling in de lijst<br>
+                2. Gebruik de statuskeuzelijst om de status bij te werken (bijv. besteld, bereiden, geserveerd)<br>
+                3. Alle wijzigingen worden direct gesynchroniseerd met de keuken en andere apparaten
+            </p>
+            
+            <h3>Betaling verwerken</h3>
+            <p>
+                De betaalinterface is speciaal ontworpen voor mobiel gebruik:
+            </p>
+            <p>
+                1. Gebruik de grandes cijfertoetsen voor eenvoudige invoer<br>
+                2. Kies uit vooraf ingestelde betaalmethoden met één tik<br>
+                3. Genereer en verstuur digitale bonnen direct vanaf uw mobiele apparaat
+            </p>
+        </div>
+        
+        <div class="guide-section">
+            <h2>Grafieken en rapportages</h2>
+            <p>
+                Alle grafieken en rapportages in BrasserieBot zijn geoptimaliseerd voor mobiele weergave, waardoor u altijd en overal inzicht heeft in uw bedrijfsgegevens.
+            </p>
+            
+            <h3>Interactieve grafieken</h3>
+            <p>
+                De grafieken zijn aanraakgevoelig en reageren op de volgende gebaren:
+            </p>
+            
+            <div class="gesture-item">
+                <div class="gesture-icon">
+                    <i data-lucide="zoom-in"></i>
+                </div>
+                <div class="gesture-content">
+                    <h4>Knijpen om te zoomen</h4>
+                    <p>Gebruik een knijpbeweging om in of uit te zoomen op grafieken voor meer detail.</p>
+                </div>
+            </div>
+            
+            <div class="gesture-item">
+                <div class="gesture-icon">
+                    <i data-lucide="move-horizontal"></i>
+                </div>
+                <div class="gesture-content">
+                    <h4>Vegen om te navigeren</h4>
+                    <p>Veeg naar links of rechts om door de gegevens in de grafiek te navigeren.</p>
+                </div>
+            </div>
+            
+            <h3>Rapportages</h3>
+            <p>
+                Rapportages worden automatisch aangepast aan uw schermgrootte, waarbij de meest belangrijke gegevens eerst worden getoond. Gebruik de filteropties bovenaan om de weergave aan te passen aan uw behoeften.
+            </p>
+        </div>
+        
+        <div class="guide-section">
+            <h2>Tips voor optimaal mobiel gebruik</h2>
+            
+            <div class="gesture-item">
+                <div class="gesture-icon">
+                    <i data-lucide="layout-dashboard"></i>
+                </div>
+                <div class="gesture-content">
+                    <h4>Toevoegen aan startscherm</h4>
+                    <p>Voeg BrasserieBot toe aan uw startscherm voor een echte app-ervaring zonder de App Store.</p>
+                </div>
+            </div>
+            
+            <div class="gesture-item">
+                <div class="gesture-icon">
+                    <i data-lucide="tablet"></i>
+                </div>
+                <div class="gesture-content">
+                    <h4>Tablet in liggend formaat</h4>
+                    <p>Op tablets werkt BrasserieBot het beste in liggend formaat, waarbij het zijmenu standaard zichtbaar is.</p>
+                </div>
+            </div>
+            
+            <div class="gesture-item">
+                <div class="gesture-icon">
+                    <i data-lucide="wifi"></i>
+                </div>
+                <div class="gesture-content">
+                    <h4>Offline modus</h4>
+                    <p>BrasserieBot ondersteunt beperkte offline functionaliteit, zodat u kunt blijven werken bij internetproblemen.</p>
+                </div>
+            </div>
+            
+            <div class="gesture-item">
+                <div class="gesture-icon">
+                    <i data-lucide="battery-charging"></i>
+                </div>
+                <div class="gesture-content">
+                    <h4>Batterijgebruik</h4>
+                    <p>Schakel naar de donkere modus via instellingen om batterijduur te verlengen op OLED-schermen.</p>
+                </div>
+            </div>
+        </div>
+        
+        <a href="dashboard.html" class="back-to-dashboard">
+            <i data-lucide="arrow-left"></i> Terug naar dashboard
+        </a>
     </div>
     
-    <div class="container">
-        <h2>Geïmplementeerde Functies</h2>
-        <ul>
-            <li>Responsive design voor alle schermformaten</li>
-            <li>Mobiel-vriendelijk menu met touch interacties</li>
-            <li>Aangepaste componenten voor kleinere schermen</li>
-            <li>Verbeterde leesbaarheid op mobiele apparaten</li>
-            <li>Geoptimaliseerde formulieren en knoppen voor touch input</li>
-        </ul>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="accessibility.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialiseer Lucide iconen
+            lucide.createIcons();
+            
+            // Controleer of gebruiker is ingelogd
+            const userJson = localStorage.getItem('brasseriebot_user');
+            if (!userJson) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
 </body>
 </html>
