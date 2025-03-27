@@ -6,8 +6,8 @@
 // Initialiseer de Supabase client
 const supabaseClient = (function() {
     // Configuratie (deze waarden worden ingesteld door Netlify)
-    const SUPABASE_URL = "https://your-project-id.supabase.co";
-    const SUPABASE_KEY = "your-anon-key";
+    const SUPABASE_DATABASE_URL = "https://yucpwawshjmonwsgvsfq.supabase.co";
+    const SUPABASE_ANON_KEY = "your-anon-key";
     
     // Privévariabelen
     let _initialized = false;
@@ -35,10 +35,10 @@ const supabaseClient = (function() {
                 }
                 
                 // Initialiseer client met de omgevingsvariabelen
-                const supabaseUrl = window.ENV && window.ENV.SUPABASE_URL ? 
-                    window.ENV.SUPABASE_URL : SUPABASE_URL;
-                const supabaseKey = window.ENV && window.ENV.SUPABASE_KEY ? 
-                    window.ENV.SUPABASE_KEY : SUPABASE_KEY;
+                const supabaseUrl = window.ENV && window.ENV.SUPABASE_DATABASE_URL ?
+                    window.ENV.SUPABASE_DATABASE_URL : SUPABASE_DATABASE_URL;
+                const supabaseKey = window.ENV && window.ENV.SUPABASE_ANON_KEY ?
+                    window.ENV.SUPABASE_ANON_KEY : SUPABASE_ANON_KEY;
                 
                 _client = supabase.createClient(supabaseUrl, supabaseKey);
                 _initialized = true;

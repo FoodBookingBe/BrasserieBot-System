@@ -324,8 +324,8 @@
     <script>
         // Omgevingsvariabelen voor Supabase
         window.ENV = {
-            SUPABASE_URL: '{{SUPABASE_URL}}',
-            SUPABASE_KEY: '{{SUPABASE_ANON_KEY}}'
+            SUPABASE_DATABASE_URL: '{{SUPABASE_DATABASE_URL}}',
+            SUPABASE_ANON_KEY: '{{SUPABASE_ANON_KEY}}'
         };
     </script>
     
@@ -388,7 +388,7 @@
                         // Als er geen fatale fout is opgetreden, beschouwen we het als succes
                         setTestStatus(document.getElementById('config-test'), 'success', 
                             `Supabase client succesvol geïnitialiseerd.<br>
-                            URL: ${window.ENV.SUPABASE_URL.replace(/^https:\/\//, '').substring(0, 12)}...`);
+                            URL: ${window.ENV.SUPABASE_DATABASE_URL.replace(/^https:\/\//, '').substring(0, 12)}...`);
                     } else {
                         setTestStatus(document.getElementById('config-test'), 'error', 
                             'Kon de Supabase client niet initialiseren. Controleer of de URL en API sleutel correct zijn ingesteld in de Netlify configuratie.');
