@@ -71,7 +71,11 @@ jobs:
           cd frontend
           npm ci
       - name: Process HTML placeholders
-        run: npm run process-html
+        run: |
+          echo "Starting HTML processing with Supabase credentials"
+          echo "SUPABASE_URL is set: ${{ secrets.SUPABASE_URL != '' }}"
+          echo "SUPABASE_ANON_KEY is set: ${{ secrets.SUPABASE_ANON_KEY != '' }}"
+          npm run process-html
         env:
           SUPABASE_DATABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
