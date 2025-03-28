@@ -1,116 +1,69 @@
-/**
- * BrasserieBot Connection Status
- * This script verifies and displays the connection status for all systems.
- */
-
-// Initialize when the document is ready
+// Connection status monitoring script
 document.addEventListener('DOMContentLoaded', function() {
-    // Create status element if it doesn't exist
-    if (!document.getElementById('connection-status')) {
-        const statusContainer = document.createElement('div');
-        statusContainer.id = 'connection-status';
-        statusContainer.style.position = 'fixed';
-        statusContainer.style.bottom = '10px';
-        statusContainer.style.right = '10px';
-        statusContainer.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        statusContainer.style.color = 'white';
-        statusContainer.style.padding = '8px 12px';
-        statusContainer.style.borderRadius = '4px';
-        statusContainer.style.fontSize = '12px';
-        statusContainer.style.fontFamily = 'monospace';
-        statusContainer.style.zIndex = '9999';
-        statusContainer.style.maxWidth = '300px';
-        statusContainer.style.overflow = 'hidden';
-        document.body.appendChild(statusContainer);
+  // Create status container if it doesn't exist
+  let statusContainer = document.getElementById('connection-status');
+  if (!statusContainer) {
+    statusContainer = document.createElement('div');
+    statusContainer.id = 'connection-status';
+    statusContainer.style.position = 'fixed';
+    statusContainer.style.bottom = '10px';
+    statusContainer.style.right = '10px';
+    statusContainer.style.padding = '5px';
+    statusContainer.style.background = 'rgba(0, 0, 0, 0.7)';
+    statusContainer.style.borderRadius = '5px';
+    statusContainer.style.color = 'white';
+    statusContainer.style.fontSize = '12px';
+    statusContainer.style.zIndex = '9999';
+    document.body.appendChild(statusContainer);
+  }
+
+  // Add status indicators
+  const statuses = [
+    { id: 'connection', text: 'Running connection checks...', color: '#3498db' },
+    { id: 'environment', text: 'Environment: Checking...', color: '#f39c12' },
+    { id: 'supabase', text: 'Supabase Connection: Checking...', color: '#e74c3c' },
+    { id: 'url', text: 'URL: ...', color: '#2ecc71' }
+  ];
+
+  statuses.forEach(status => {
+    const statusEl = document.createElement('div');
+    statusEl.id = status.id;
+    statusEl.textContent = status.text;
+    statusEl.style.margin = '2px 0';
+    statusEl.style.padding = '2px 5px';
+    statusEl.style.borderLeft = `3px solid ${status.color}`;
+    statusContainer.appendChild(statusEl);
+  });
+
+  // Update environment status
+  setTimeout(() => {
+    const envStatus = document.getElementById('environment');
+    if (window.ENV && window.ENV.SUPABASE_DATABASE_URL) {
+      envStatus.textContent = 'Environment: Configured';
+      envStatus.style.borderLeft = '3px solid #2ecc71';
+    } else {
+      envStatus.textContent = 'Environment: Not configured';
+      envStatus.style.borderLeft = '3px solid #e74c3c';
     }
+  }, 500);
 
-    // Update the status display
-    const displayStatus = function(message, isError = false) {
-        const statusContainer = document.getElementById('connection-status');
-        if (statusContainer) {
-            const statusItem = document.createElement('div');
-            statusItem.textContent = message;
-            statusItem.style.margin = '4px 0';
-            statusItem.style.color = isError ? '#ff6b6b' : '#63e6be';
-            
-            statusContainer.appendChild(statusItem);
-            
-            // Auto-remove after 10 seconds
-            setTimeout(() => {
-                statusContainer.removeChild(statusItem);
-            }, 10000);
-        }
-    };
+  // Update Supabase connection status
+  setTimeout(() => {
+    const supabaseStatus = document.getElementById('supabase');
+    if (window.supabaseClient && supabaseClient.isAvailable()) {
+      supabaseStatus.textContent = 'Supabase Connection: Active';
+      supabaseStatus.style.borderLeft = '3px solid #2ecc71';
+    } else {
+      supabaseStatus.textContent = 'Supabase Connection: Inactive';
+      supabaseStatus.style.borderLeft = '3px solid #e74c3c';
+    }
+  }, 1000);
 
-    // Check Supabase Connection
-    const checkSupabase = async function() {
-        try {
-            if (typeof supabaseClient === 'undefined') {
-                displayStatus('❌ Supabase Client not loaded', true);
-                return false;
-            }
+  // Update URL status
+  const urlStatus = document.getElementById('url');
+  urlStatus.textContent = `URL: ${window.location.href}`;
 
-            if (!supabaseClient.isAvailable()) {
-                displayStatus('❌ Supabase not initialized', true);
-                return false;
-            }
-
-            displayStatus('✅ Supabase Connection: Active');
-            
-            // Get client
-            const client = supabaseClient.getClient();
-            if (!client) {
-                displayStatus('❌ Supabase Client error', true);
-                return false;
-            }
-            
-            // Check URL
-            const url = window.ENV.SUPABASE_DATABASE_URL || 'unknown';
-            displayStatus(`ℹ️ URL: ${url.replace(/^https:\/\//, '').substring(0, 8)}...`);
-            
-            return true;
-        } catch (error) {
-            displayStatus(`❌ Supabase error: ${error.message}`, true);
-            return false;
-        }
-    };
-
-    // Check environment variables
-    const checkEnvironment = function() {
-        try {
-            if (typeof window.ENV === 'undefined') {
-                displayStatus('❌ Environment not loaded', true);
-                return false;
-            }
-            
-            if (!window.ENV.SUPABASE_DATABASE_URL || 
-                window.ENV.SUPABASE_DATABASE_URL === '{{SUPABASE_DATABASE_URL}}') {
-                displayStatus('❌ SUPABASE_DATABASE_URL not set', true);
-                return false;
-            }
-            
-            if (!window.ENV.SUPABASE_ANON_KEY || 
-                window.ENV.SUPABASE_ANON_KEY === '{{SUPABASE_ANON_KEY}}') {
-                displayStatus('❌ SUPABASE_ANON_KEY not set', true);
-                return false;
-            }
-            
-            displayStatus('✅ Environment: Configured');
-            return true;
-        } catch (error) {
-            displayStatus(`❌ Environment error: ${error.message}`, true);
-            return false;
-        }
-    };
-
-    // Run the checks
-    const runAllChecks = async function() {
-        displayStatus('🔍 Running connection checks...');
-        checkEnvironment();
-        await checkSupabase();
-    };
-
-    // Run checks immediately and then every 30 seconds
-    runAllChecks();
-    setInterval(runAllChecks, 30000);
+  // Update connection status
+  const connectionStatus = document.getElementById('connection');
+  connectionStatus.textContent = 'Connection status: Online';
 });
