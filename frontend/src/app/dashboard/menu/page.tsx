@@ -1,106 +1,119 @@
 'use client';
-import { useState, useEffect } from 'react';
-import MenuItemCard from '@/components/MenuItemCard';
-import { fetchMenuItems, placeOrder } from '@/services/menuService';
-import type { MenuItem } from '@/components/MenuItemCard';
+
+import { useEffect, useState } from 'react';
+import '../dashboard.css';
 
 export default function MenuPage() {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const [cart, setCart] = useState<{item: MenuItem, quantity: number}[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('lunch');
 
   useEffect(() => {
-    const loadMenu = async () => {
-      try {
-        const items = await fetchMenuItems();
-        setMenuItems(items);
-      } catch (err) {
-        setError('Kon menu niet laden. Probeer het later opnieuw.');
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadMenu();
+    // Set the title when component mounts
+    document.title = 'BrasserieBot - Menu & Prijzen';
   }, []);
 
-  const addToCart = (item: MenuItem) => {
-    setCart(prev => {
-      const existing = prev.find(i => i.item.id === item.id);
-      if (existing) {
-        return prev.map(i => 
-          i.item.id === item.id 
-            ? {...i, quantity: i.quantity + 1} 
-            : i
-        );
-      }
-      return [...prev, {item, quantity: 1}];
-    });
-  };
-
-  const handlePlaceOrder = async () => {
-    try {
-      const orderItems = cart.map(({item, quantity}) => ({
-        id: item.id,
-        quantity
-      }));
-      await placeOrder(orderItems);
-      alert('Bestelling succesvol geplaatst!');
-      setCart([]);
-    } catch (err) {
-      alert('Bestelling plaatsen mislukt. Probeer opnieuw.');
-      console.error(err);
-    }
-  };
-
-  const totalPrice = cart.reduce(
-    (sum, item) => sum + (item.item.price * item.quantity), 
-    0
-  );
-
-  if (isLoading) return <div className="p-6 text-center">Menu laden...</div>;
-  if (error) return <div className="p-6 text-red-500">{error}</div>;
-
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Menu</h1>
+    <div className="page active" id="menu">
+      <h1>Menu & Prijzen</h1>
+      <p>Beheer je menukaart en prijzen.</p>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {menuItems.map(item => (
-          <MenuItemCard 
-            key={item.id} 
-            item={item} 
-            onAdd={addToCart}
-          />
-        ))}
-      </div>
-
-      {cart.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4">
-          <h2 className="font-bold text-lg mb-2">Jouw Bestelling</h2>
-          <div className="max-h-40 overflow-y-auto mb-2">
-            {cart.map(({item, quantity}) => (
-              <div key={item.id} className="flex justify-between py-1">
-                <span>
-                  {quantity}x {item.name}
-                </span>
-                <span>€{(item.price * quantity).toFixed(2)}</span>
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-between font-bold border-t pt-2">
-            <span>Totaal:</span>
-            <span>€{totalPrice.toFixed(2)}</span>
-          </div>
-          <button 
-            className="w-full mt-4 bg-green-500 text-white py-2 rounded hover:bg-green-600 transition"
-            onClick={handlePlaceOrder}
-          >
-            Bestelling Plaatsen
-          </button>
+      <div className="ai-insight">
+        <div className="ai-insight-title"><i>🤖</i> AI Inzicht</div>
+        <div>De biefstuk en zalmfilet zijn de best verkopende items deze maand, maar de winstmarge op de zalmfilet is 15% lager door gestegen inkoopprijzen.</div>
+        <div className="ai-action">
+          <div className="ai-action-title"><i>✓</i> Aanbevolen Actie</div>
+          <div>Overweeg de prijs van de zalmfilet met €1,50 te verhogen of zoek naar een alternatieve leverancier voor zalm.</div>
         </div>
-      )}
+      </div>
+      
+      <div className="tabs">
+        <div 
+          className={`tab ${activeTab === 'lunch' ? 'active' : ''}`}
+          onClick={() => setActiveTab('lunch')}
+        >
+          Lunch
+        </div>
+        <div 
+          className={`tab ${activeTab === 'diner' ? 'active' : ''}`}
+          onClick={() => setActiveTab('diner')}
+        >
+          Diner
+        </div>
+        <div 
+          className={`tab ${activeTab === 'dranken' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dranken')}
+        >
+          Dranken
+        </div>
+        <div 
+          className={`tab ${activeTab === 'desserts' ? 'active' : ''}`}
+          onClick={() => setActiveTab('desserts')}
+        >
+          Desserts
+        </div>
+      </div>
+      
+      <div className="card">
+        <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px"}}>
+          <h2 style={{margin: 0}}>Menukaart</h2>
+          <button className="btn">Nieuw Item</button>
+        </div>
+        
+        <div className="menu-category">
+          <h3>Voorgerechten</h3>
+          
+          <div className="menu-item-row">
+            <div className="menu-item-details">
+              <div className="menu-item-name">Carpaccio</div>
+              <div className="menu-item-description">Rundercarpaccio met parmezaanse kaas, pijnboompitten en truffelmayonaise</div>
+            </div>
+            <div className="menu-item-price">€12,50</div>
+          </div>
+          
+          <div className="menu-item-row">
+            <div className="menu-item-details">
+              <div className="menu-item-name">Tomatensoep</div>
+              <div className="menu-item-description">Huisgemaakte tomatensoep met basilicum en crème fraîche</div>
+            </div>
+            <div className="menu-item-price">€6,75</div>
+          </div>
+          
+          <div className="menu-item-row">
+            <div className="menu-item-details">
+              <div className="menu-item-name">Garnalenkroketjes</div>
+              <div className="menu-item-description">Huisgemaakte garnalenkroketjes met citroenmayonaise</div>
+            </div>
+            <div className="menu-item-price">€9,50</div>
+          </div>
+        </div>
+        
+        <div className="menu-category">
+          <h3>Hoofdgerechten</h3>
+          
+          <div className="menu-item-row">
+            <div className="menu-item-details">
+              <div className="menu-item-name">Biefstuk</div>
+              <div className="menu-item-description">Gegrilde biefstuk met seizoensgroenten en pepersaus</div>
+            </div>
+            <div className="menu-item-price">€23,50</div>
+          </div>
+          
+          <div className="menu-item-row">
+            <div className="menu-item-details">
+              <div className="menu-item-name">Zalmfilet</div>
+              <div className="menu-item-description">Gebakken zalmfilet met hollandaisesaus en geroosterde groenten</div>
+            </div>
+            <div className="menu-item-price">€21,00</div>
+          </div>
+          
+          <div className="menu-item-row">
+            <div className="menu-item-details">
+              <div className="menu-item-name">Risotto (V)</div>
+              <div className="menu-item-description">Paddenstoelenrisotto met truffelolie en parmezaanse kaas</div>
+            </div>
+            <div className="menu-item-price">€18,50</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

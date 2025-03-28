@@ -1,17 +1,20 @@
 {
   "name": "brasseriebot-system",
   "version": "1.0.0",
-  "description": "BrasserieBot Restaurant Management System",
-  "type": "module",
+  "description": "BrasserieBot Systeem voor Restaurant Automatisering",
+  "main": "index.js",
   "scripts": {
-    "start": "cd frontend/public && npx serve",
-    "build": "node frontend/public/process-html.js",
-    "deploy": "netlify deploy --prod"
+    "validate": "node utils/infrastructure-validator.js",
+    "optimize-db": "cd database/migrations && node execute-live-queries.js",
+    "process-html": "node build-scripts/process-html.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "engines": {
-    "node": ">=18"
+  "dependencies": {
+    "@octokit/rest": "^19.0.13",
+    "@supabase/supabase-js": "^2.42.0",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1"
   },
-  "devDependencies": {
-    "serve": "^14.2.0"
-  }
+  "author": "BrasserieBot Team",
+  "license": "MIT"
 }

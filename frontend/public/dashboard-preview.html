@@ -1,351 +1,219 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Preview</title>
+    <title>BrasserieBot Dashboard Preview</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background-color: #f5f5f5;
-        }
-        .dashboard-container {
-            display: flex;
-            height: 600px;
-            width: 900px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            margin: 20px auto;
         }
-        .sidebar {
-            width: 240px;
-            background-color: #1f2937;
-            color: white;
-            padding: 20px;
-        }
-        .sidebar-header {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 30px;
-        }
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .sidebar-menu li {
-            padding: 10px 15px;
-            margin-bottom: 5px;
-            border-radius: 6px;
+        
+        .container {
             display: flex;
-            align-items: center;
+            height: 100vh;
         }
-        .sidebar-menu li.active {
-            background-color: #3b82f6;
-        }
-        .sidebar-menu li:not(.active) {
-            background-color: transparent;
-        }
-        .sidebar-menu li:hover:not(.active) {
-            background-color: #374151;
-        }
-        .sidebar-menu-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-        }
-        .main-content {
-            flex: 1;
-            background-color: white;
+        
+        .sidebar {
+            width: 60px;
+            background-color: #fff;
+            border-right: 1px solid #ddd;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            height: 100%;
             overflow-y: auto;
         }
-        .header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        
+        .logo {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
         }
-        .header-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #111827;
-        }
-        .user-profile {
-            display: flex;
-            align-items: center;
-        }
-        .avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #3b82f6;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 10px;
-        }
-        .dashboard-content {
-            padding: 20px;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-        .stat-card {
-            background-color: white;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
-        }
-        .stat-label {
-            color: #6b7280;
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #111827;
-        }
-        .stat-change {
+        
+        .logo h1 {
+            margin: 0;
+            color: #0066cc;
             font-size: 12px;
-            margin-top: 4px;
         }
-        .positive {
-            color: #10b981;
+        
+        .menu-item {
+            padding: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            font-size: 18px;
         }
-        .negative {
-            color: #ef4444;
+        
+        .menu-item:hover {
+            background-color: #f0f7ff;
         }
-        .card-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 16px;
+        
+        .menu-item.active {
+            background-color: #e6f0ff;
+            color: #0066cc;
         }
-        .card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
+        
+        .content {
+            flex: 1;
+            padding: 10px;
             overflow: hidden;
         }
-        .card-header {
-            padding: 16px;
-            border-bottom: 1px solid #e5e7eb;
+        
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 10px;
+            flex: 1;
+            min-width: 80px;
+            font-size: 10px;
+        }
+        
+        .stat-value {
+            font-size: 14px;
             font-weight: bold;
-            color: #111827;
+            margin: 5px 0;
         }
-        .card-content {
-            padding: 16px;
+        
+        .stat-change {
+            color: #28a745;
+            font-size: 10px;
         }
+        
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 10px;
+        }
+        
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 12px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 8px;
         }
-        th {
+        
+        table th, table td {
+            padding: 4px;
             text-align: left;
-            padding: 8px;
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #6b7280;
+            border-bottom: 1px solid #eee;
         }
-        td {
-            padding: 8px;
-            border-top: 1px solid #e5e7eb;
-            font-size: 14px;
+        
+        table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
         }
-        .status-badge {
+        
+        .badge {
             display: inline-block;
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 12px;
-            font-weight: 500;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 8px;
+            font-weight: bold;
         }
-        .status-completed {
-            background-color: #d1fae5;
-            color: #065f46;
+        
+        .badge-success {
+            background-color: #e6f7e6;
+            color: #28a745;
         }
-        .status-preparing {
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
-        .status-pending {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        .insight-item {
-            display: flex;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .insight-icon {
-            width: 24px;
-            height: 24px;
-            background-color: #dbeafe;
-            border-radius: 50%;
-            margin-right: 12px;
-            flex-shrink: 0;
-        }
-        .insight-text {
-            font-size: 14px;
-            color: #4b5563;
+        
+        .badge-info {
+            background-color: #e6f0ff;
+            color: #0066cc;
         }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
+    <div class="container">
         <div class="sidebar">
-            <div class="sidebar-header">BrasserieBot</div>
-            <ul class="sidebar-menu">
-                <li class="active">
-                    <div class="sidebar-menu-icon"></div>
-                    Dashboard
-                </li>
-                <li>
-                    <div class="sidebar-menu-icon"></div>
-                    Restaurants
-                </li>
-                <li>
-                    <div class="sidebar-menu-icon"></div>
-                    Menus
-                </li>
-                <li>
-                    <div class="sidebar-menu-icon"></div>
-                    Orders
-                </li>
-                <li>
-                    <div class="sidebar-menu-icon"></div>
-                    Suppliers
-                </li>
-                <li>
-                    <div class="sidebar-menu-icon"></div>
-                    Payments
-                </li>
-                <li>
-                    <div class="sidebar-menu-icon"></div>
-                    AI Advisor
-                </li>
-            </ul>
+            <div class="logo">
+                <h1>BB</h1>
+            </div>
+            <div class="menu-item active">📊</div>
+            <div class="menu-item">📅</div>
+            <div class="menu-item">📦</div>
+            <div class="menu-item">👥</div>
+            <div class="menu-item">🍽️</div>
+            <div class="menu-item">❤️</div>
+            <div class="menu-item">📈</div>
+            <div class="menu-item">💳</div>
         </div>
-        <div class="main-content">
-            <div class="header">
-                <div class="header-title">Dashboard</div>
-                <div class="user-profile">
-                    <div class="avatar">JD</div>
-                    <span>John Doe</span>
+        
+        <div class="content">
+            <h1 style="font-size: 14px; margin-top: 0;">Dashboard Overview</h1>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div>Omzet Vandaag</div>
+                    <div class="stat-value">€1,245</div>
+                    <div class="stat-change">+12%</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div>Reserveringen</div>
+                    <div class="stat-value">28</div>
+                    <div class="stat-change">+4</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div>Bestellingen</div>
+                    <div class="stat-value">15</div>
+                    <div class="stat-change">+3</div>
                 </div>
             </div>
-            <div class="dashboard-content">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Total Revenue</div>
-                        <div class="stat-value">€24,345</div>
-                        <div class="stat-change positive">+12.5%</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Orders</div>
-                        <div class="stat-value">356</div>
-                        <div class="stat-change positive">+8.2%</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Customers</div>
-                        <div class="stat-value">189</div>
-                        <div class="stat-change positive">+5.7%</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Avg. Order Value</div>
-                        <div class="stat-value">€68.38</div>
-                        <div class="stat-change negative">-2.3%</div>
-                    </div>
-                </div>
-                <div class="card-grid">
-                    <div class="card">
-                        <div class="card-header">Recent Orders</div>
-                        <div class="card-content">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Order ID</th>
-                                        <th>Customer</th>
-                                        <th>Total</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>ORD-001</td>
-                                        <td>Alice Johnson</td>
-                                        <td>€78.50</td>
-                                        <td><span class="status-badge status-completed">Completed</span></td>
-                                        <td>2025-03-24</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ORD-002</td>
-                                        <td>Bob Smith</td>
-                                        <td>€124.00</td>
-                                        <td><span class="status-badge status-preparing">Preparing</span></td>
-                                        <td>2025-03-24</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ORD-003</td>
-                                        <td>Carol Williams</td>
-                                        <td>€45.75</td>
-                                        <td><span class="status-badge status-pending">Pending</span></td>
-                                        <td>2025-03-23</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ORD-004</td>
-                                        <td>David Brown</td>
-                                        <td>€92.30</td>
-                                        <td><span class="status-badge status-completed">Completed</span></td>
-                                        <td>2025-03-23</td>
-                                    </tr>
-                                    <tr>
-                                        <td>ORD-005</td>
-                                        <td>Eva Davis</td>
-                                        <td>€56.20</td>
-                                        <td><span class="status-badge status-completed">Delivered</span></td>
-                                        <td>2025-03-22</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header">AI Insights</div>
-                        <div class="card-content">
-                            <div class="insight-item">
-                                <div class="insight-icon"></div>
-                                <div class="insight-text">Your lunch menu is performing 15% better than dinner. Consider expanding lunch options.</div>
-                            </div>
-                            <div class="insight-item">
-                                <div class="insight-icon"></div>
-                                <div class="insight-text">Supplier payments for produce are 8% higher than industry average. Review contracts.</div>
-                            </div>
-                            <div class="insight-item">
-                                <div class="insight-icon"></div>
-                                <div class="insight-text">Customer retention has improved by 12% this month. Your loyalty program is working!</div>
-                            </div>
-                            <div class="insight-item" style="border-bottom: none;">
-                                <div class="insight-icon"></div>
-                                <div class="insight-text">Tuesday evenings show consistently low traffic. Consider a weekday special promotion.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            
+            <div class="card">
+                <h2>Recente Activiteiten</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tijd</th>
+                            <th>Activiteit</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>19:45</td>
+                            <td>Nieuwe bestelling #1237</td>
+                            <td><span class="badge badge-info">Nieuw</span></td>
+                        </tr>
+                        <tr>
+                            <td>19:30</td>
+                            <td>Nieuwe bestelling #1236</td>
+                            <td><span class="badge badge-info">Nieuw</span></td>
+                        </tr>
+                        <tr>
+                            <td>18:30</td>
+                            <td>Reservering voor 4 personen</td>
+                            <td><span class="badge badge-success">Bevestigd</span></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

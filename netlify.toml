@@ -2,13 +2,16 @@
   # Publish the frontend/public directory directly
   publish = "frontend/public"
   # Process HTML files to inject environment variables
-  command = "node frontend/public/process-html.js"
+  command = "node build-scripts/process-html.js"
 
 # Configuratie voor Netlify plaatshoudervervanging
 [context.production]
   [context.production.environment]
+    NODE_VERSION = "18"
     SUPABASE_DATABASE_URL = "https://yucpwawshjmonwsgvsfq.supabase.co"
     SUPABASE_ANON_KEY = "from_netlify_ui"
+    ENABLE_ERROR_MONITORING = "true"
+    ENABLE_CACHING = "true"
 
 [context.deploy-preview]
   [context.deploy-preview.environment]

@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-03-28T16:00:26.227Z",
+  "overall": "issues",
+  "components": {
+    "supabase": {
+      "status": "error",
+      "issues": [
+        "Verbindingsfout: relation \"public.pg_tables\" does not exist",
+        "Tabel ontbreekt: reservations",
+        "Tabel ontbreekt: orders",
+        "Tabel ontbreekt: menu_items",
+        "Tabel ontbreekt: restaurants",
+        "Tabel ontbreekt: migrations",
+        "Tabel ontbreekt: restaurant_staff",
+        "Fout bij ophalen RLS policies: relation \"public.pg_policies\" does not exist",
+        "Fout bij ophalen indexen: relation \"public.pg_indexes\" does not exist",
+        "Fout bij uitvoeren SQL script: Request failed with status code 404"
+      ],
+      "fixes": []
+    },
+    "github": {
+      "status": "error",
+      "issues": [
+        "Geen .github/workflows directory gevonden"
+      ],
+      "fixes": []
+    },
+    "netlify": {
+      "status": "error",
+      "issues": [
+        "netlify.toml mist [build.environment] sectie",
+        "Netlify API token niet geconfigureerd"
+      ],
+      "fixes": []
+    },
+    "mcp": {
+      "status": "ok",
+      "issues": [],
+      "fixes": []
+    }
+  }
+}

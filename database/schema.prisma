@@ -130,7 +130,11 @@ model Order {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
-  @@index([restaurantId])
+  // Composite indexes for improved query performance
+  @@index([restaurantId, status])
+  @@index([restaurantId, createdAt])
+  
+  // Individual indexes
   @@index([status])
   @@index([createdAt])
 }
@@ -174,9 +178,12 @@ model Reservation {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
-  @@index([restaurantId])
-  @@index([reservationDate])
+  // Composite indexes for improved query performance
+  @@index([restaurantId, reservationDate])
+  
+  // Individual indexes
   @@index([status])
+  @@index([reservationDate])
 }
 
 enum ReservationStatus {

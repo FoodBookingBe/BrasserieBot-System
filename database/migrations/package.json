@@ -1,0 +1,15 @@
+{
+  "name": "brasseriebot-migrations",
+  "version": "1.0.0",
+  "description": "Database migratie systeem voor BrasserieBot",
+  "main": "index.js",
+  "scripts": {
+    "migrate": "node index.js",
+    "execute-live": "node execute-live-queries.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.42.0",
+    "axios": "^1.6.5",
+    "dotenv": "^16.4.0"
+  }
+}
