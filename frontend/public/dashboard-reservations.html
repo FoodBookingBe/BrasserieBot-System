@@ -1,0 +1,146 @@
+<!-- Reservations Page Content -->
+<main class="content hidden" id="reservations-content">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Reservatiebeheer</h1>
+            <p class="page-subtitle">Beheer en overzicht van alle reserveringen</p>
+        </div>
+        <button class="primary-btn" id="add-reservation-btn">
+            <i data-lucide="plus"></i>
+            <span>Nieuwe reservering</span>
+        </button>
+    </div>
+
+    <!-- Loading indicator -->
+    <div id="loading-indicator" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Gegevens laden...</p>
+    </div>
+
+    <!-- Date filter bar -->
+    <div class="filter-bar">
+        <div class="date-filters">
+            <a href="#" class="date-filter active" data-filter="today">Vandaag</a>
+            <a href="#" class="date-filter" data-filter="tomorrow">Morgen</a>
+            <a href="#" class="date-filter" data-filter="week">Deze week</a>
+            <a href="#" class="date-filter" data-filter="all">Alle reserveringen</a>
+        </div>
+        <div class="search-container small">
+            <span class="search-icon"><i data-lucide="search"></i></span>
+            <input type="text" class="search-input" placeholder="Zoek reserveringen...">
+        </div>
+    </div>
+
+    <!-- Reservations stats -->
+    <div class="mini-stats">
+        <div class="mini-stat">
+            <p class="mini-stat-label">Totaal reserveringen</p>
+            <p class="mini-stat-value"><span id="reservation-count">0</span></p>
+        </div>
+        <div class="mini-stat">
+            <p class="mini-stat-label">Vandaag</p>
+            <p class="mini-stat-value">24</p>
+        </div>
+        <div class="mini-stat">
+            <p class="mini-stat-label">Morgen</p>
+            <p class="mini-stat-value">18</p>
+        </div>
+        <div class="mini-stat">
+            <p class="mini-stat-label">Open plekken</p>
+            <p class="mini-stat-value">12</p>
+        </div>
+    </div>
+
+    <!-- Reservations table -->
+    <div class="card table-card">
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Naam</th>
+                        <th>Datum</th>
+                        <th>Tijd</th>
+                        <th>Personen</th>
+                        <th>Status</th>
+                        <th class="actions-column">Acties</th>
+                    </tr>
+                </thead>
+                <tbody id="reservations-table-body">
+                    <!-- Reservations will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Reservation Modal -->
+    <div class="modal" id="reservation-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Nieuwe reservering</h2>
+                <button id="close-modal-btn" class="close-btn" aria-label="Sluiten">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="reservation-form">
+                    <input type="hidden" id="reservation-id">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reservation-name">Naam</label>
+                            <input type="text" id="reservation-name" class="input-field" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reservation-people">Aantal personen</label>
+                            <input type="number" id="reservation-people" class="input-field" min="1" max="20" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reservation-date">Datum</label>
+                            <input type="date" id="reservation-date" class="input-field" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reservation-time">Tijd</label>
+                            <input type="time" id="reservation-time" class="input-field" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reservation-phone">Telefoonnummer</label>
+                            <input type="tel" id="reservation-phone" class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <label for="reservation-email">E-mailadres</label>
+                            <input type="email" id="reservation-email" class="input-field">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reservation-notes">Opmerkingen</label>
+                        <textarea id="reservation-notes" class="input-field" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reservation-status">Status</label>
+                        <select id="reservation-status" class="input-field" required>
+                            <option value="pending">In behandeling</option>
+                            <option value="confirmed">Bevestigd</option>
+                            <option value="cancelled">Geannuleerd</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="cancel-btn" class="secondary-btn">Annuleren</button>
+                        <button type="submit" class="primary-btn">Opslaan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Notification -->
+<div class="notification" id="notification">
+    <p id="notification-message"></p>
+</div>
