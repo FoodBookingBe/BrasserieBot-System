@@ -70,7 +70,7 @@ async function showDeploymentNotification() {
         
         if (deployment.state === 'ready') {
             console.log(`\n✅ DEPLOYMENT SUCCESVOL!`);
-            console.log(`🌐 Website URL: https://${NETLIFY_SITE_ID}.netlify.app`);
+            console.log(`🌐 Website URL: https://brasseriebotapp.netlify.app`);
             console.log(`🔗 Admin URL: ${deployment.admin_url}`);
         } else if (deployment.state === 'error') {
             console.log(`\n❌ DEPLOYMENT MISLUKT!`);
@@ -82,13 +82,13 @@ async function showDeploymentNotification() {
         }
     } else {
         console.log("\n❓ Geen recente deployment informatie gevonden");
-        console.log(`🌐 Website URL: https://${NETLIFY_SITE_ID}.netlify.app`);
+        console.log(`🌐 Website URL: https://brasseriebotapp.netlify.app`);
     }
 
     // Voeg instructies toe voor een handmatige deployment
     console.log("\n📋 HANDMATIGE DEPLOYMENT:");
     console.log("Als de automatische deployment niet werkt, voer dan de volgende stappen uit:");
-    console.log("1. Ga naar https://app.netlify.com/sites/" + NETLIFY_SITE_ID);
+    console.log("1. Ga naar https://app.netlify.com/sites/brasseriebotapp");
     console.log("2. Klik op 'Deploys' in de navigatiebalk");
     console.log("3. Klik op 'Trigger deploy' -> 'Deploy site'");
     
