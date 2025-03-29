@@ -8,6 +8,207 @@
     <link rel="stylesheet" href="responsive.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.363.0/dist/umd/lucide.min.css">
+    <style>
+        /* Uitlog knop styling */
+        .sidebar-logout-btn {
+            display: flex;
+            align-items: center;
+            background-color: transparent;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            color: #64748b;
+            padding: 8px 12px;
+            margin-top: 15px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-logout-btn:hover {
+            background-color: #f1f5f9;
+            color: #0066cc;
+        }
+        
+        .sidebar-logout-btn i {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar-logout-btn {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+        }
+
+        /* Reservation specific styles */
+        .date-filters {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .date-filter {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .date-filter:hover {
+            color: #0066cc;
+        }
+
+        .date-filter.active {
+            color: #0066cc;
+            border-bottom-color: #0066cc;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 992px) {
+            .stat-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stat-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #cbd5e1;
+        }
+
+        .status-indicator.connected {
+            background-color: #10b981;
+        }
+
+        .status-indicator.disconnected {
+            background-color: #f97316;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: #0066cc;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1100;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification.error {
+            background-color: #ef4444;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -108,6 +309,18 @@
                         <p class="user-email">admin@brasseriebot.com</p>
                     </div>
                 </div>
+                <a href="mobile-guide.html" class="sidebar-link" style="display: flex; align-items: center; margin-top: 15px; color: #0066cc; font-size: 14px;">
+                    <i data-lucide="smartphone" style="margin-right: 8px; width: 16px; height: 16px;"></i>
+                    <span>Mobiele Gebruikersgids</span>
+                </a>
+                <a href="supabase-test.html" class="sidebar-link" style="display: flex; align-items: center; margin-top: 8px; color: #0066cc; font-size: 14px;">
+                    <i data-lucide="database" style="margin-right: 8px; width: 16px; height: 16px;"></i>
+                    <span>Supabase Testtool</span>
+                </a>
+                <button id="logout-button" class="sidebar-logout-btn">
+                    <i data-lucide="log-out"></i>
+                    <span>Uitloggen</span>
+                </button>
             </div>
         </div>
 
@@ -274,148 +487,8 @@
                 </div>
             </main>
 
-            <!-- Reservations Page Content -->
-            <main class="content hidden" id="reservations-content">
-                <div class="page-header">
-                    <div>
-                        <h1 class="page-title">Reservatiebeheer</h1>
-                        <p class="page-subtitle">Beheer en overzicht van alle reserveringen</p>
-                    </div>
-                    <button class="primary-btn" id="add-reservation-btn">
-                        <i data-lucide="plus"></i>
-                        <span>Nieuwe reservering</span>
-                    </button>
-                </div>
-
-                <!-- Loading indicator -->
-                <div id="loading-indicator" class="loading-overlay">
-                    <div class="loading-spinner"></div>
-                    <p>Gegevens laden...</p>
-                </div>
-
-                <!-- Date filter bar -->
-                <div class="filter-bar">
-                    <div class="date-filters">
-                        <a href="#" class="date-filter active" data-filter="today">Vandaag</a>
-                        <a href="#" class="date-filter" data-filter="tomorrow">Morgen</a>
-                        <a href="#" class="date-filter" data-filter="week">Deze week</a>
-                        <a href="#" class="date-filter" data-filter="all">Alle reserveringen</a>
-                    </div>
-                    <div class="search-container small">
-                        <span class="search-icon"><i data-lucide="search"></i></span>
-                        <input type="text" class="search-input" placeholder="Zoek reserveringen...">
-                    </div>
-                </div>
-
-                <!-- Reservations stats -->
-                <div class="mini-stats">
-                    <div class="mini-stat">
-                        <p class="mini-stat-label">Totaal reserveringen</p>
-                        <p class="mini-stat-value"><span id="reservation-count">0</span></p>
-                    </div>
-                    <div class="mini-stat">
-                        <p class="mini-stat-label">Vandaag</p>
-                        <p class="mini-stat-value">24</p>
-                    </div>
-                    <div class="mini-stat">
-                        <p class="mini-stat-label">Morgen</p>
-                        <p class="mini-stat-value">18</p>
-                    </div>
-                    <div class="mini-stat">
-                        <p class="mini-stat-label">Open plekken</p>
-                        <p class="mini-stat-value">12</p>
-                    </div>
-                </div>
-
-                <!-- Reservations table -->
-                <div class="card table-card">
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Naam</th>
-                                    <th>Datum</th>
-                                    <th>Tijd</th>
-                                    <th>Personen</th>
-                                    <th>Status</th>
-                                    <th class="actions-column">Acties</th>
-                                </tr>
-                            </thead>
-                            <tbody id="reservations-table-body">
-                                <!-- Reservations will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Reservation Modal -->
-                <div class="modal" id="reservation-modal">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h2 id="modal-title">Nieuwe reservering</h2>
-                            <button id="close-modal-btn" class="close-btn" aria-label="Sluiten">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="reservation-form">
-                                <input type="hidden" id="reservation-id">
-                                
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="reservation-name">Naam</label>
-                                        <input type="text" id="reservation-name" class="input-field" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="reservation-people">Aantal personen</label>
-                                        <input type="number" id="reservation-people" class="input-field" min="1" max="20" required>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="reservation-date">Datum</label>
-                                        <input type="date" id="reservation-date" class="input-field" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="reservation-time">Tijd</label>
-                                        <input type="time" id="reservation-time" class="input-field" required>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="reservation-phone">Telefoonnummer</label>
-                                        <input type="tel" id="reservation-phone" class="input-field">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="reservation-email">E-mailadres</label>
-                                        <input type="email" id="reservation-email" class="input-field">
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="reservation-notes">Opmerkingen</label>
-                                    <textarea id="reservation-notes" class="input-field" rows="3"></textarea>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="reservation-status">Status</label>
-                                    <select id="reservation-status" class="input-field" required>
-                                        <option value="pending">In behandeling</option>
-                                        <option value="confirmed">Bevestigd</option>
-                                        <option value="cancelled">Geannuleerd</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-actions">
-                                    <button type="button" id="cancel-btn" class="secondary-btn">Annuleren</button>
-                                    <button type="submit" class="primary-btn">Opslaan</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </main>
-
+            <!-- Reservations Content is added by reservations-section.js -->
+            
             <!-- Database Page -->
             <main class="content hidden" id="database-content">
                 <div class="page-header">
@@ -470,10 +543,10 @@
                                         <td>156</td>
                                         <td>2025-03-25</td>
                                         <td class="actions-cell">
-                                            <button class="icon-btn primary" aria-label="Bewerk reservations tabel">
+                                            <button class="icon-btn primary" title="Bewerk reservations tabel">
                                                 <i data-lucide="edit"></i>
                                             </button>
-                                            <button class="icon-btn danger" aria-label="Verwijder reservations tabel">
+                                            <button class="icon-btn danger" title="Verwijder reservations tabel">
                                                 <i data-lucide="trash-2"></i>
                                             </button>
                                         </td>
@@ -488,10 +561,10 @@
                                         <td>342</td>
                                         <td>2025-03-24</td>
                                         <td class="actions-cell">
-                                            <button class="icon-btn primary" aria-label="Bewerk customers tabel">
+                                            <button class="icon-btn primary" title="Bewerk customers tabel">
                                                 <i data-lucide="edit"></i>
                                             </button>
-                                            <button class="icon-btn danger" aria-label="Verwijder customers tabel">
+                                            <button class="icon-btn danger" title="Verwijder customers tabel">
                                                 <i data-lucide="trash-2"></i>
                                             </button>
                                         </td>
@@ -506,10 +579,10 @@
                                         <td>78</td>
                                         <td>2025-03-20</td>
                                         <td class="actions-cell">
-                                            <button class="icon-btn primary" aria-label="Bewerk menu_items tabel">
+                                            <button class="icon-btn primary" title="Bewerk menu_items tabel">
                                                 <i data-lucide="edit"></i>
                                             </button>
-                                            <button class="icon-btn danger" aria-label="Verwijder menu_items tabel">
+                                            <button class="icon-btn danger" title="Verwijder menu_items tabel">
                                                 <i data-lucide="trash-2"></i>
                                             </button>
                                         </td>
@@ -550,7 +623,7 @@
                             <p>Herstel uw database vanuit een eerder gemaakte backup</p>
                             <div class="file-upload-container">
                                 <label for="backup-file">Selecteer backup bestand</label>
-                                <input type="file" id="backup-file" class="file-input" aria-label="Selecteer backup bestand">
+                                <input type="file" id="backup-file" class="file-input" title="Selecteer backup bestand">
                                 <button class="secondary-btn">Herstellen</button>
                             </div>
                         </div>
@@ -577,7 +650,7 @@
                     <div class="tab-content active" id="test-content">
                         <div class="form-group">
                             <label for="prompt-template">Selecteer template of maak een nieuwe</label>
-                            <select id="prompt-template" class="input-field">
+                            <select id="prompt-template" class="input-field" title="Selecteer een template">
                                 <option value="">Selecteer een template of maak een nieuwe...</option>
                                 <option value="1">Feature Planning - Ontwikkeling</option>
                                 <option value="2">Horeca Processen - Domeinkennis</option>
@@ -624,7 +697,7 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
                             </div>
                             <div class="filter-actions">
                                 <label for="category-filter" class="sr-only">Filter op categorie</label>
-                                <select id="category-filter" class="input-field small" aria-label="Filter op categorie">
+                                <select id="category-filter" class="input-field small" title="Filter op categorie">
                                     <option>Alle categorieën</option>
                                     <option>Ontwikkeling</option>
                                     <option>Domeinkennis</option>
@@ -642,10 +715,10 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
                                         <p>25 maart 2025, 14:32</p>
                                     </div>
                                     <div class="history-actions">
-                                        <button class="icon-btn primary" aria-label="Bewerk prompt">
+                                        <button class="icon-btn primary" title="Bewerk prompt">
                                             <i data-lucide="edit"></i>
                                         </button>
-                                        <button class="icon-btn" aria-label="Voer prompt opnieuw uit">
+                                        <button class="icon-btn" title="Voer prompt opnieuw uit">
                                             <i data-lucide="play"></i>
                                         </button>
                                     </div>
@@ -668,10 +741,10 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
                                         <p>24 maart 2025, 09:15</p>
                                     </div>
                                     <div class="history-actions">
-                                        <button class="icon-btn primary" aria-label="Bewerk prompt">
+                                        <button class="icon-btn primary" title="Bewerk prompt">
                                             <i data-lucide="edit"></i>
                                         </button>
-                                        <button class="icon-btn" aria-label="Voer prompt opnieuw uit">
+                                        <button class="icon-btn" title="Voer prompt opnieuw uit">
                                             <i data-lucide="play"></i>
                                         </button>
                                     </div>
@@ -696,7 +769,7 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
                             
                             <div class="form-group">
                                 <label for="ai-model">AI Model</label>
-                                <select id="ai-model" class="input-field">
+                                <select id="ai-model" class="input-field" title="Selecteer AI Model">
                                     <option value="claude-3-7">Claude 3.7 (Aanbevolen)</option>
                                     <option value="claude-3-5">Claude 3.5</option>
                                     <option value="gpt-4o">GPT-4o</option>
@@ -753,69 +826,167 @@ Analyseer deze feature request, stel verduidelijkende vragen indien nodig, en be
         </div>
     </div>
 
-    <!-- Notification -->
-    <div class="notification" id="notification">
-        <p id="notification-message"></p>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
-    <!-- Supabase Integration -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="environment.js"></script>
-    <script src="supabase-client.js"></script>
-    <script src="connection-status.js"></script>
-    <script src="improved-auth.js"></script>
-    <script src="supabase-reservations.js"></script>  <!-- Add Supabase reservations module -->
-    <script src="script.js"></script>
     <script>
-        // Initialize Supabase Reservations on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set up tab navigation
-            const navLinks = document.querySelectorAll('.sidebar-nav a');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetPage = this.getAttribute('href').substring(1);
-                    showPage(targetPage);
+        // Omgevingsvariabelen voor Supabase - deze worden automatisch ingevuld door Netlify
+        window.ENV = {
+            SUPABASE_DATABASE_URL: '{{SUPABASE_DATABASE_URL}}',
+            SUPABASE_ANON_KEY: '{{SUPABASE_ANON_KEY}}'
+        };
+    </script>
+    <script src="supabase-client.js"></script>
+    <script src="supabase-reservations.js"></script>
+    <script src="api-client.js"></script>
+    <script src="dashboard-data.js"></script>
+    <script src="reservations.js"></script>
+    <script src="reservations-section.js"></script>
+    <script src="accessibility.js"></script>
+    <script>
+    // Eenvoudige authenticatie controle
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check of de gebruiker is ingelogd
+        const userJson = localStorage.getItem('brasseriebot_user');
+        if (!userJson) {
+            window.location.href = 'login.html';
+        }
+        
+        // Update de gebruikersinformatie
+        try {
+            const user = JSON.parse(userJson);
+            const userAvatar = document.querySelector('.user-avatar span');
+            const userName = document.querySelector('.user-name');
+            const userEmail = document.querySelector('.user-email');
+            const welcomeText = document.querySelector('.welcome-text span');
+            
+            if (userAvatar && user.username) {
+                const initials = user.username.substring(0, 2).toUpperCase();
+                userAvatar.textContent = initials;
+            }
+            
+            if (userName && user.restaurantName) {
+                userName.textContent = user.restaurantName;
+            }
+            
+            if (userEmail && user.username) {
+                userEmail.textContent = user.username + '@brasseriebot.com';
+            }
+            
+            if (welcomeText && user.username) {
+                welcomeText.textContent = 'Welkom, ' + user.username;
+            }
+        } catch (error) {
+            console.error('Fout bij parsen gebruikersdata:', error);
+        }
+
+        // Initialiseer Lucide iconen
+        lucide.createIcons();
+        
+        // Event listener voor menu toggle op mobiel
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        
+        if (menuToggle && sidebar && sidebarOverlay) {
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('mobile-active');
+                sidebarOverlay.classList.toggle('active');
+            });
+            
+            sidebarOverlay.addEventListener('click', function() {
+                sidebar.classList.remove('mobile-active');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
+        
+        // Uitlog functionaliteit toevoegen
+        const logoutButton = document.getElementById('logout-button');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function() {
+                // Verwijder user data uit localStorage
+                localStorage.removeItem('brasseriebot_user');
+                localStorage.removeItem('brasseriebot_auth_time');
+                
+                // Doorsturen naar login pagina
+                window.location.href = 'login.html';
+            });
+        }
+        
+        // Event listeners voor navigatie links
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Verwijder 'active' class van alle nav items
+                navLinks.forEach(navLink => {
+                    navLink.parentElement.classList.remove('active');
+                });
+                
+                // Voeg 'active' class toe aan het geklikte item
+                this.parentElement.classList.add('active');
+                
+                // Haal de target pagina ID op (zonder #)
+                const targetId = this.getAttribute('href').substring(1);
+                
+                // Toon de juiste pagina content
+                showPage(targetId);
+                
+                // Sluit mobiel menu als nodig
+                if (window.innerWidth <= 768 && sidebar && sidebarOverlay) {
+                    sidebar.classList.remove('mobile-active');
+                    sidebarOverlay.classList.remove('active');
+                }
+            });
+        });
+        
+        // Tab navigatie
+        const tabButtons = document.querySelectorAll('.tab');
+        if (tabButtons) {
+            tabButtons.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabSet = this.parentElement;
+                    const tabId = this.getAttribute('data-tab');
+                    const tabContentId = tabId + '-content';
+                    
+                    // Deactiveer alle tabs in deze set
+                    tabSet.querySelectorAll('.tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    
+                    // Activeer deze tab
+                    this.classList.add('active');
+                    
+                    // Verberg alle tab content
+                    const tabContents = tabSet.parentElement.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Toon de juiste tab content
+                    const activeContent = document.getElementById(tabContentId);
+                    if (activeContent) {
+                        activeContent.classList.add('active');
+                    }
                 });
             });
+        }
+    });
 
-            // Initialize Supabase Reservations module when reservations page is shown
-            window.showPage = function(page) {
-                // Hide all content sections
-                document.querySelectorAll('.content').forEach(section => {
-                    section.classList.add('hidden');
-                });
-                
-                // Show target content section
-                const targetSection = document.getElementById(`${page}-content`);
-                if (targetSection) {
-                    targetSection.classList.remove('hidden');
-                }
-                
-                // Update active nav item
-                document.querySelectorAll('.sidebar-nav li').forEach(item => {
-                    item.classList.remove('active');
-                });
-                
-                const activeNav = document.querySelector(`.sidebar-nav a[href="#${page}"]`);
-                if (activeNav) {
-                    activeNav.parentElement.classList.add('active');
-                }
-                
-                // Initialize reservations module when showing reservations page
-                if (page === 'reservations' && window.BrasserieBotSupabaseReservations) {
-                    console.log('Initializing Supabase Reservations module');
-                    window.BrasserieBotSupabaseReservations.init();
-                }
-            };
-
-            // Set initial page to dashboard
-            showPage('dashboard');
-            
-            // Initialize Lucide icons
-            lucide.createIcons();
+    // Functie voor het tonen van een specifieke pagina
+    function showPage(pageId) {
+        // Verberg alle content pagina's
+        const contentPages = document.querySelectorAll('.content');
+        contentPages.forEach(page => {
+            page.classList.add('hidden');
         });
+        
+        // Toon de geselecteerde pagina
+        const targetPage = document.getElementById(pageId + '-content');
+        if (targetPage) {
+            targetPage.classList.remove('hidden');
+        }
+    }
     </script>
 </body>
 </html>

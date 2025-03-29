@@ -1,601 +1,394 @@
 /**
- * BrasserieBot Reservations module with Supabase integration
- * This module replaces the localStorage implementation with Supabase database storage
+ * BrasserieBot Supabase Reservations Handler
+ * 
+ * Dit bestand biedt functionaliteit voor het beheren van reserveringen
+ * met Supabase als backend en een fallback naar lokale opslag indien Supabase niet beschikbaar is.
  */
 
-// Initialize the reservations module with Supabase
-function initSupabaseReservations() {
-    console.log('Initializing Supabase Reservations Module');
-    
-    // First, ensure Supabase client is initialized
-    if (!supabaseClient.isAvailable()) {
-        console.log('Supabase client not initialized, initializing now...');
-        supabaseClient.init()
-            .then(() => {
-                console.log('Supabase client initialized, loading reservations');
-                loadReservationsFromSupabase();
-            })
-            .catch(error => {
-                console.error('Failed to initialize Supabase client:', error);
-                // Fall back to local sample data
-                loadSampleReservations();
-            });
-    } else {
-        // Supabase already initialized, load reservations
-        loadReservationsFromSupabase();
+// Supabase Reserveringen Handler
+class SupabaseReservationsHandler {
+    constructor() {
+        this.supabase = window.supabaseClient;
+        this.connected = false;
+        this.tableName = 'reservations';
+        this.localStorageKey = 'brasseriebot_reservations';
+        
+        // Initialiseer verbinding en test deze
+        this.initialize();
     }
     
-    // Set up event listeners
-    document.getElementById('add-reservation-btn').addEventListener('click', () => {
-        showReservationModal();
-    });
-    
-    document.getElementById('close-modal-btn').addEventListener('click', () => {
-        closeReservationModal();
-    });
-    
-    document.getElementById('reservation-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        addReservationToSupabase();
-    });
-    
-    // Set up date filters
-    const dateFilterLinks = document.querySelectorAll('.date-filter');
-    dateFilterLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const filter = e.target.getAttribute('data-filter');
+    async initialize() {
+        try {
+            // Test de verbinding door een eenvoudige query uit te voeren
+            const { error } = await this.supabase
+                .from(this.tableName)
+                .select('count(*)', { count: 'exact' })
+                .limit(1);
+                
+            if (error) {
+                throw new Error('Supabase verbindingsfout: ' + error.message);
+            }
             
-            // Remove active class from all links
-            dateFilterLinks.forEach(link => link.classList.remove('active'));
+            this.connected = true;
+            console.log('Supabase reserveringen verbinding succesvol!');
             
-            // Add active class to clicked link
-            e.target.classList.add('active');
+            // Update UI status indicator (als die bestaat)
+            this.updateConnectionStatus(true);
             
-            // Apply filter
-            filterReservationsByDate(filter);
-        });
-    });
-}
-
-// Sample reservation data for fallback
-const sampleReservations = [
-    {
-        id: '1',
-        name: "Jan Janssen",
-        people: 4,
-        date: "2025-03-28",
-        time: "19:00",
-        phone: "+31 6 12345678",
-        email: "jan@example.com",
-        notes: "Bij het raam a.u.b.",
-        status: "confirmed"
-    },
-    {
-        id: '2',
-        name: "Petra de Vries",
-        people: 2,
-        date: "2025-03-28",
-        time: "20:30",
-        phone: "+31 6 23456789",
-        email: "petra@example.com",
-        notes: "Verjaardag",
-        status: "confirmed"
-    },
-    {
-        id: '3',
-        name: "Willem Bakker",
-        people: 6,
-        date: "2025-03-29",
-        time: "18:00",
-        phone: "+31 6 34567890",
-        email: "willem@example.com",
-        notes: "Kinderen aanwezig",
-        status: "pending"
-    },
-    {
-        id: '4',
-        name: "Emma Visser",
-        people: 3,
-        date: "2025-03-29",
-        time: "19:30",
-        phone: "+31 6 45678901",
-        email: "emma@example.com",
-        notes: "",
-        status: "confirmed"
-    },
-    {
-        id: '5',
-        name: "Daan Smit",
-        people: 2,
-        date: "2025-03-30",
-        time: "20:00",
-        phone: "+31 6 56789012",
-        email: "daan@example.com",
-        notes: "Allergie: noten",
-        status: "confirmed"
+            // Synchroniseer lokale data met Supabase als we weer online zijn
+            this.syncLocalWithRemote();
+        } catch (err) {
+            console.warn('Supabase reserveringen verbinding mislukt, gebruik lokale opslag:', err.message);
+            this.connected = false;
+            
+            // Update UI status indicator (als die bestaat)
+            this.updateConnectionStatus(false);
+        }
     }
-];
-
-// Load sample reservations as fallback
-function loadSampleReservations() {
-    console.log('Loading sample reservations (fallback mode)');
-    renderReservationsTable(sampleReservations);
-    showConnectionError();
-}
-
-// Show connection error notification
-function showConnectionError() {
-    showNotification('Geen verbinding met database. Lokale gegevens worden gebruikt.', 'warning', 5000);
-}
-
-// Load reservations from Supabase
-async function loadReservationsFromSupabase() {
-    try {
-        showLoadingIndicator(true);
-        
-        // Get current restaurant ID (for demo we'll use a fixed ID)
-        const restaurantId = getActiveRestaurantId();
-        
-        // Get Supabase client
-        const client = supabaseClient.getClient();
-        
-        if (!client) {
-            console.error('Supabase client not available');
-            loadSampleReservations();
-            return;
-        }
-        
-        // Query reservations table
-        const { data, error } = await client
-            .from('reservations')
-            .select('*')
-            .eq('restaurant_id', restaurantId)
-            .order('reservation_date', { ascending: true })
-            .order('reservation_time', { ascending: true });
-        
-        if (error) {
-            console.error('Error fetching reservations:', error);
-            loadSampleReservations();
-            return;
-        }
-        
-        if (data && data.length > 0) {
-            console.log('Loaded', data.length, 'reservations from Supabase');
+    
+    updateConnectionStatus(isConnected) {
+        const statusEl = document.getElementById('reservations-connection-status');
+        if (statusEl) {
+            statusEl.textContent = isConnected ? 'Verbonden met Supabase' : 'Offline modus (lokale opslag)';
             
-            // Transform data to match our expected format
-            const formattedReservations = data.map(reservation => ({
-                id: reservation.id,
-                name: reservation.customer_name,
-                people: reservation.party_size,
-                date: reservation.reservation_date,
-                time: reservation.reservation_time,
-                phone: reservation.customer_phone,
-                email: reservation.customer_email,
-                notes: reservation.special_requests,
-                status: reservation.status
-            }));
-            
-            renderReservationsTable(formattedReservations);
-            showNotification('Reserveringen geladen vanuit database', 'success');
+            const indicatorEl = document.querySelector('.status-indicator');
+            if (indicatorEl) {
+                indicatorEl.classList.toggle('connected', isConnected);
+                indicatorEl.classList.toggle('disconnected', !isConnected);
+            }
+        }
+    }
+    
+    // Haal reserveringen op, gefilterd op datum indien opgegeven
+    async getReservations(filter = {}) {
+        if (this.connected) {
+            try {
+                let query = this.supabase.from(this.tableName).select('*');
+                
+                // Pas filter toe indien aanwezig
+                if (filter.date) {
+                    query = query.eq('date', filter.date);
+                } else if (filter.dateStart && filter.dateEnd) {
+                    query = query.gte('date', filter.dateStart).lte('date', filter.dateEnd);
+                } else if (filter.status) {
+                    query = query.eq('status', filter.status);
+                }
+                
+                // Voer de query uit
+                const { data, error } = await query.order('date', { ascending: true });
+                
+                if (error) throw error;
+                return data || [];
+            } catch (err) {
+                console.error('Fout bij ophalen reserveringen van Supabase:', err);
+                // Fallback naar lokale opslag bij fout
+                return this.getLocalReservations(filter);
+            }
         } else {
-            console.log('No reservations found in database, showing samples');
-            loadSampleReservations();
+            // Gebruik lokale opslag als we niet verbonden zijn
+            return this.getLocalReservations(filter);
         }
-    } catch (error) {
-        console.error('Error in loadReservationsFromSupabase:', error);
-        loadSampleReservations();
-    } finally {
-        showLoadingIndicator(false);
-    }
-}
-
-// Helper function to get current restaurant ID
-function getActiveRestaurantId() {
-    // In a real app, this would come from the user's session or URL
-    // For demo, we'll use a fixed ID
-    return 'e42c7ce0-4c77-4d9c-8426-32d65d6a3c5e';
-}
-
-// Show/hide loading indicator
-function showLoadingIndicator(show) {
-    const loadingIndicator = document.getElementById('loading-indicator');
-    if (loadingIndicator) {
-        loadingIndicator.style.display = show ? 'flex' : 'none';
-    }
-}
-
-// Render reservations table
-function renderReservationsTable(reservations) {
-    const tableBody = document.getElementById('reservations-table-body');
-    tableBody.innerHTML = '';
-    
-    if (!reservations || reservations.length === 0) {
-        const emptyRow = document.createElement('tr');
-        emptyRow.innerHTML = `<td colspan="6" class="text-center py-4">Geen reserveringen gevonden</td>`;
-        tableBody.appendChild(emptyRow);
-        document.getElementById('reservation-count').textContent = '0';
-        return;
     }
     
-    reservations.forEach(reservation => {
-        const row = document.createElement('tr');
-        
-        // Create status badge
-        let statusClass = '';
-        switch(reservation.status) {
-            case 'confirmed':
-                statusClass = 'badge-success';
-                break;
-            case 'pending':
-                statusClass = 'badge-warning';
-                break;
-            case 'cancelled':
-                statusClass = 'badge-danger';
-                break;
-            default:
-                statusClass = 'badge-secondary';
+    // Filter lokale reserveringen
+    getLocalReservations(filter = {}) {
+        try {
+            // Haal reserveringen op uit localStorage
+            const reservationsJson = localStorage.getItem(this.localStorageKey);
+            let reservations = reservationsJson ? JSON.parse(reservationsJson) : [];
+            
+            // Pas filter toe indien opgegeven
+            if (filter.date) {
+                reservations = reservations.filter(r => r.date === filter.date);
+            } else if (filter.dateStart && filter.dateEnd) {
+                reservations = reservations.filter(r => 
+                    r.date >= filter.dateStart && r.date <= filter.dateEnd
+                );
+            } else if (filter.status) {
+                reservations = reservations.filter(r => r.status === filter.status);
+            }
+            
+            // Sorteer op datum
+            reservations.sort((a, b) => {
+                if (a.date === b.date) {
+                    return a.time.localeCompare(b.time);
+                }
+                return a.date.localeCompare(b.date);
+            });
+            
+            return reservations;
+        } catch (err) {
+            console.error('Fout bij ophalen lokale reserveringen:', err);
+            return [];
+        }
+    }
+    
+    // Voeg een nieuwe reservering toe
+    async addReservation(reservation) {
+        if (!reservation.id) {
+            reservation.id = this.generateUUID();
         }
         
-        // Format date for display
-        const date = new Date(reservation.date);
-        const formattedDate = date.toLocaleDateString('nl-NL', {
-            weekday: 'short',
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
-        
-        row.innerHTML = `
-            <td>${reservation.name}</td>
-            <td>${formattedDate}</td>
-            <td>${reservation.time}</td>
-            <td>${reservation.people}</td>
-            <td><span class="badge ${statusClass}">${reservation.status}</span></td>
-            <td class="actions-cell">
-                <button class="icon-btn primary" aria-label="Bewerk reservering" onclick="BrasserieBotSupabaseReservations.editReservation('${reservation.id}')">
-                    <i data-lucide="edit"></i>
-                </button>
-                <button class="icon-btn danger" aria-label="Verwijder reservering" onclick="BrasserieBotSupabaseReservations.deleteReservation('${reservation.id}')">
-                    <i data-lucide="trash-2"></i>
-                </button>
-            </td>
-        `;
-        
-        tableBody.appendChild(row);
-    });
-    
-    // Re-initialize Lucide icons
-    if (window.lucide && typeof window.lucide.createIcons === 'function') {
-        lucide.createIcons();
+        if (this.connected) {
+            try {
+                const { data, error } = await this.supabase
+                    .from(this.tableName)
+                    .insert(reservation)
+                    .select();
+                    
+                if (error) throw error;
+                
+                console.log('Reservering succesvol toegevoegd aan Supabase');
+                return data[0] || reservation;
+            } catch (err) {
+                console.error('Fout bij toevoegen reservering aan Supabase:', err);
+                // Store locally as fallback
+                this.addLocalReservation(reservation);
+                return reservation;
+            }
+        } else {
+            // Store in localStorage when offline
+            this.addLocalReservation(reservation);
+            return reservation;
+        }
     }
     
-    // Update reservation count
-    document.getElementById('reservation-count').textContent = reservations.length;
-}
-
-// Filter reservations by date
-function filterReservationsByDate(filter) {
-    // Get Supabase client
-    const client = supabaseClient.getClient();
-    
-    if (!client) {
-        console.error('Supabase client not available');
-        return;
+    // Voeg een reservering toe aan lokale opslag
+    addLocalReservation(reservation) {
+        try {
+            const reservationsJson = localStorage.getItem(this.localStorageKey);
+            const reservations = reservationsJson ? JSON.parse(reservationsJson) : [];
+            
+            // Voeg de nieuwe reservering toe
+            reservations.push(reservation);
+            
+            // Sla de bijgewerkte lijst op
+            localStorage.setItem(this.localStorageKey, JSON.stringify(reservations));
+            console.log('Reservering lokaal opgeslagen');
+            
+            // Flag dat er ongesynchroniseerde wijzigingen zijn
+            localStorage.setItem('brasseriebot_sync_needed', 'true');
+            
+            return reservation;
+        } catch (err) {
+            console.error('Fout bij lokaal opslaan van reservering:', err);
+            return reservation;
+        }
     }
     
-    showLoadingIndicator(true);
-    
-    // Get current restaurant ID
-    const restaurantId = getActiveRestaurantId();
-    
-    // Build query
-    let query = client
-        .from('reservations')
-        .select('*')
-        .eq('restaurant_id', restaurantId);
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayStr = today.toISOString().split('T')[0];
-    
-    switch(filter) {
-        case 'today':
-            query = query.eq('reservation_date', todayStr);
-            break;
-        case 'tomorrow':
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowStr = tomorrow.toISOString().split('T')[0];
-            query = query.eq('reservation_date', tomorrowStr);
-            break;
-        case 'week':
-            const endOfWeek = new Date(today);
-            endOfWeek.setDate(endOfWeek.getDate() + 7);
-            const endOfWeekStr = endOfWeek.toISOString().split('T')[0];
-            query = query.gte('reservation_date', todayStr)
-                         .lte('reservation_date', endOfWeekStr);
-            break;
-        case 'all':
-        default:
-            // No additional filter, return all
-            break;
+    // Update een bestaande reservering
+    async updateReservation(id, updates) {
+        if (this.connected) {
+            try {
+                const { data, error } = await this.supabase
+                    .from(this.tableName)
+                    .update(updates)
+                    .eq('id', id)
+                    .select();
+                    
+                if (error) throw error;
+                
+                console.log('Reservering succesvol bijgewerkt in Supabase');
+                return data[0];
+            } catch (err) {
+                console.error('Fout bij bijwerken reservering in Supabase:', err);
+                // Update locally as fallback
+                return this.updateLocalReservation(id, updates);
+            }
+        } else {
+            // Update in localStorage when offline
+            return this.updateLocalReservation(id, updates);
+        }
     }
     
-    // Order results
-    query = query.order('reservation_date', { ascending: true })
-                .order('reservation_time', { ascending: true });
+    // Update een reservering in lokale opslag
+    updateLocalReservation(id, updates) {
+        try {
+            const reservationsJson = localStorage.getItem(this.localStorageKey);
+            let reservations = reservationsJson ? JSON.parse(reservationsJson) : [];
+            
+            // Zoek de reservering op basis van ID
+            const index = reservations.findIndex(r => r.id === id);
+            
+            if (index !== -1) {
+                // Update de reservering
+                reservations[index] = { ...reservations[index], ...updates };
+                
+                // Sla de bijgewerkte lijst op
+                localStorage.setItem(this.localStorageKey, JSON.stringify(reservations));
+                console.log('Reservering lokaal bijgewerkt');
+                
+                // Flag dat er ongesynchroniseerde wijzigingen zijn
+                localStorage.setItem('brasseriebot_sync_needed', 'true');
+                
+                return reservations[index];
+            }
+            
+            return null;
+        } catch (err) {
+            console.error('Fout bij lokaal bijwerken van reservering:', err);
+            return null;
+        }
+    }
     
-    // Execute query
-    query.then(({ data, error }) => {
-        showLoadingIndicator(false);
+    // Verwijder een reservering
+    async deleteReservation(id) {
+        if (this.connected) {
+            try {
+                const { error } = await this.supabase
+                    .from(this.tableName)
+                    .delete()
+                    .eq('id', id);
+                    
+                if (error) throw error;
+                
+                console.log('Reservering succesvol verwijderd uit Supabase');
+                return true;
+            } catch (err) {
+                console.error('Fout bij verwijderen reservering uit Supabase:', err);
+                // Delete locally as fallback
+                return this.deleteLocalReservation(id);
+            }
+        } else {
+            // Delete from localStorage when offline
+            return this.deleteLocalReservation(id);
+        }
+    }
+    
+    // Verwijder een reservering uit lokale opslag
+    deleteLocalReservation(id) {
+        try {
+            const reservationsJson = localStorage.getItem(this.localStorageKey);
+            let reservations = reservationsJson ? JSON.parse(reservationsJson) : [];
+            
+            // Filter de te verwijderen reservering eruit
+            const filteredReservations = reservations.filter(r => r.id !== id);
+            
+            // Als er een reservering verwijderd is
+            if (filteredReservations.length < reservations.length) {
+                // Sla de bijgewerkte lijst op
+                localStorage.setItem(this.localStorageKey, JSON.stringify(filteredReservations));
+                console.log('Reservering lokaal verwijderd');
+                
+                // Flag dat er ongesynchroniseerde wijzigingen zijn
+                localStorage.setItem('brasseriebot_sync_needed', 'true');
+                
+                return true;
+            }
+            
+            return false;
+        } catch (err) {
+            console.error('Fout bij lokaal verwijderen van reservering:', err);
+            return false;
+        }
+    }
+    
+    // Synchroniseer lokale wijzigingen met Supabase
+    async syncLocalWithRemote() {
+        // Controleer of synchronisatie nodig is
+        const syncNeeded = localStorage.getItem('brasseriebot_sync_needed') === 'true';
         
-        if (error) {
-            console.error('Error filtering reservations:', error);
-            showNotification('Fout bij het filteren van reserveringen', 'error');
+        if (!syncNeeded || !this.connected) {
             return;
         }
         
-        if (data) {
-            console.log(`Loaded ${data.length} reservations with filter: ${filter}`);
+        try {
+            console.log('Synchroniseren van lokale reserveringen met Supabase...');
             
-            // Transform data to match our expected format
-            const formattedReservations = data.map(reservation => ({
-                id: reservation.id,
-                name: reservation.customer_name,
-                people: reservation.party_size,
-                date: reservation.reservation_date,
-                time: reservation.reservation_time,
-                phone: reservation.customer_phone,
-                email: reservation.customer_email,
-                notes: reservation.special_requests,
-                status: reservation.status
-            }));
+            const reservationsJson = localStorage.getItem(this.localStorageKey);
+            const localReservations = reservationsJson ? JSON.parse(reservationsJson) : [];
             
-            renderReservationsTable(formattedReservations);
+            // Haal bestaande reserveringen op uit Supabase
+            const { data: remoteReservations, error } = await this.supabase
+                .from(this.tableName)
+                .select('id');
+                
+            if (error) throw error;
+            
+            const remoteIds = remoteReservations.map(r => r.id);
+            
+            // Verwerk elke lokale reservering
+            for (const reservation of localReservations) {
+                if (remoteIds.includes(reservation.id)) {
+                    // Update bestaande reservering
+                    await this.supabase
+                        .from(this.tableName)
+                        .update(reservation)
+                        .eq('id', reservation.id);
+                } else {
+                    // Voeg nieuwe reservering toe
+                    await this.supabase
+                        .from(this.tableName)
+                        .insert(reservation);
+                }
+            }
+            
+            // Reset synchronisatie flag
+            localStorage.removeItem('brasseriebot_sync_needed');
+            console.log('Synchronisatie met Supabase voltooid');
+        } catch (err) {
+            console.error('Fout bij synchroniseren met Supabase:', err);
         }
-    });
-}
-
-// Show reservation modal
-function showReservationModal(reservation = null) {
-    const modal = document.getElementById('reservation-modal');
-    const form = document.getElementById('reservation-form');
+    }
     
-    // Reset form
-    form.reset();
+    // Hulpfunctie om een UUID te genereren
+    generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
     
-    // Set modal title
-    document.getElementById('modal-title').textContent = reservation ? 'Reservering bewerken' : 'Nieuwe reservering';
+    // Verschillende helpers voor statistieken
     
-    // Pre-fill form if editing
-    if (reservation) {
-        document.getElementById('reservation-id').value = reservation.id;
-        document.getElementById('reservation-name').value = reservation.name;
-        document.getElementById('reservation-people').value = reservation.people;
-        document.getElementById('reservation-date').value = reservation.date;
-        document.getElementById('reservation-time').value = reservation.time;
-        document.getElementById('reservation-phone').value = reservation.phone;
-        document.getElementById('reservation-email').value = reservation.email;
-        document.getElementById('reservation-notes').value = reservation.notes;
-        document.getElementById('reservation-status').value = reservation.status;
-    } else {
-        document.getElementById('reservation-id').value = '';
-        // Set default date to tomorrow
+    // Haal aantal reserveringen op voor vandaag
+    async getTodayReservationsCount() {
+        const today = new Date().toISOString().split('T')[0];
+        const reservations = await this.getReservations({ date: today });
+        return reservations.length;
+    }
+    
+    // Haal aantal reserveringen op voor morgen
+    async getTomorrowReservationsCount() {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        document.getElementById('reservation-date').value = tomorrow.toISOString().split('T')[0];
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+        const reservations = await this.getReservations({ date: tomorrowStr });
+        return reservations.length;
     }
     
-    // Show modal
-    modal.classList.add('show');
-}
-
-// Close reservation modal
-function closeReservationModal() {
-    const modal = document.getElementById('reservation-modal');
-    modal.classList.remove('show');
-}
-
-// Edit reservation
-async function editReservation(id) {
-    // Get Supabase client
-    const client = supabaseClient.getClient();
-    
-    if (!client) {
-        console.error('Supabase client not available');
-        showNotification('Database niet beschikbaar', 'error');
-        return;
-    }
-    
-    try {
-        showLoadingIndicator(true);
+    // Haal aantal reserveringen op voor deze week
+    async getThisWeekReservationsCount() {
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        const endOfWeek = new Date(today);
         
-        // Query reservation
-        const { data, error } = await client
-            .from('reservations')
-            .select('*')
-            .eq('id', id)
-            .single();
+        // Bepaal start en eind van de week (maandag-zondag)
+        const dayOfWeek = today.getDay(); // 0 = zondag, 1 = maandag, etc.
+        const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
         
-        if (error) {
-            console.error('Error fetching reservation:', error);
-            showNotification('Fout bij ophalen reservering', 'error');
-            return;
-        }
+        startOfWeek.setDate(diff);
+        endOfWeek.setDate(diff + 6);
         
-        if (data) {
-            const reservation = {
-                id: data.id,
-                name: data.customer_name,
-                people: data.party_size,
-                date: data.reservation_date,
-                time: data.reservation_time,
-                phone: data.customer_phone,
-                email: data.customer_email,
-                notes: data.special_requests,
-                status: data.status
-            };
-            
-            showReservationModal(reservation);
-        } else {
-            showNotification('Reservering niet gevonden', 'error');
-        }
-    } catch (error) {
-        console.error('Error in editReservation:', error);
-        showNotification('Fout bij bewerken reservering', 'error');
-    } finally {
-        showLoadingIndicator(false);
+        const startStr = startOfWeek.toISOString().split('T')[0];
+        const endStr = endOfWeek.toISOString().split('T')[0];
+        
+        const reservations = await this.getReservations({ 
+            dateStart: startStr,
+            dateEnd: endStr
+        });
+        
+        return reservations.length;
     }
 }
 
-// Add or update reservation to Supabase
-async function addReservationToSupabase() {
-    // Get Supabase client
-    const client = supabaseClient.getClient();
-    
-    if (!client) {
-        console.error('Supabase client not available');
-        showNotification('Database niet beschikbaar', 'error');
-        return;
+// Initialiseer de Supabase reserveringen handler wanneer het document geladen is
+document.addEventListener('DOMContentLoaded', function() {
+    // Wacht tot de Supabase client beschikbaar is
+    if (window.supabaseClient) {
+        window.BrasserieBotSupabaseReservations = new SupabaseReservationsHandler();
+    } else {
+        console.warn('Supabase client niet beschikbaar, kan reserveringen niet initialiseren');
     }
-    
-    // Get reservation ID
-    const reservationId = document.getElementById('reservation-id').value;
-    
-    // Get form data
-    const reservationData = {
-        restaurant_id: getActiveRestaurantId(),
-        customer_name: document.getElementById('reservation-name').value,
-        party_size: parseInt(document.getElementById('reservation-people').value),
-        reservation_date: document.getElementById('reservation-date').value,
-        reservation_time: document.getElementById('reservation-time').value,
-        customer_phone: document.getElementById('reservation-phone').value,
-        customer_email: document.getElementById('reservation-email').value,
-        special_requests: document.getElementById('reservation-notes').value,
-        status: document.getElementById('reservation-status').value,
-        updated_at: new Date().toISOString()
-    };
-    
-    try {
-        showLoadingIndicator(true);
-        
-        if (reservationId) {
-            // Update existing reservation
-            const { data, error } = await client
-                .from('reservations')
-                .update(reservationData)
-                .eq('id', reservationId)
-                .select();
-            
-            if (error) {
-                console.error('Error updating reservation:', error);
-                showNotification('Fout bij bijwerken reservering', 'error');
-                return;
-            }
-            
-            console.log('Updated reservation:', data);
-            showNotification('Reservering bijgewerkt', 'success');
-        } else {
-            // Add new reservation
-            const { data, error } = await client
-                .from('reservations')
-                .insert([{ ...reservationData, created_at: new Date().toISOString() }])
-                .select();
-            
-            if (error) {
-                console.error('Error creating reservation:', error);
-                showNotification('Fout bij maken reservering', 'error');
-                return;
-            }
-            
-            console.log('Created reservation:', data);
-            showNotification('Reservering toegevoegd', 'success');
-        }
-        
-        // Close modal
-        closeReservationModal();
-        
-        // Refresh reservations
-        loadReservationsFromSupabase();
-    } catch (error) {
-        console.error('Error in addReservationToSupabase:', error);
-        showNotification('Fout bij opslaan reservering', 'error');
-    } finally {
-        showLoadingIndicator(false);
-    }
-}
-
-// Delete reservation
-async function deleteReservation(id) {
-    if (!confirm('Weet u zeker dat u deze reservering wilt verwijderen?')) {
-        return;
-    }
-    
-    // Get Supabase client
-    const client = supabaseClient.getClient();
-    
-    if (!client) {
-        console.error('Supabase client not available');
-        showNotification('Database niet beschikbaar', 'error');
-        return;
-    }
-    
-    try {
-        showLoadingIndicator(true);
-        
-        // Delete reservation
-        const { error } = await client
-            .from('reservations')
-            .delete()
-            .eq('id', id);
-        
-        if (error) {
-            console.error('Error deleting reservation:', error);
-            showNotification('Fout bij verwijderen reservering', 'error');
-            return;
-        }
-        
-        console.log('Deleted reservation:', id);
-        showNotification('Reservering verwijderd', 'success');
-        
-        // Refresh reservations
-        loadReservationsFromSupabase();
-    } catch (error) {
-        console.error('Error in deleteReservation:', error);
-        showNotification('Fout bij verwijderen reservering', 'error');
-    } finally {
-        showLoadingIndicator(false);
-    }
-}
-
-// Show notification with type
-function showNotification(message, type = 'success', duration = 3000) {
-    const notification = document.getElementById('notification');
-    const notificationMessage = document.getElementById('notification-message');
-    
-    // Remove existing type classes
-    notification.classList.remove('success', 'error', 'warning', 'info');
-    
-    // Add type class
-    notification.classList.add(type);
-    
-    notificationMessage.textContent = message;
-    notification.classList.add('show');
-    
-    // Hide notification after duration
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, duration);
-}
-
-// Export functions
-window.BrasserieBotSupabaseReservations = {
-    init: initSupabaseReservations,
-    showReservationModal: showReservationModal,
-    closeReservationModal: closeReservationModal,
-    addReservation: addReservationToSupabase,
-    editReservation: editReservation,
-    deleteReservation: deleteReservation,
-    filterReservationsByDate: filterReservationsByDate
-};
+});

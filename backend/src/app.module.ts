@@ -18,12 +18,21 @@ import type { RedisClientOptions } from 'redis';
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
-        host: configService.get('REDIS_HOST') || 'localhost',
-        port: configService.get('REDIS_PORT') || 6379,
-        ttl: configService.get('CACHE_TTL') || 60, // seconds
-      }),
+      // Removed unnecessary async
+      useFactory: (configService: ConfigService) => {
+        const host = configService.get<string>('REDIS_HOST') || 'localhost';
+        // Ensure port is a number
+        const port = parseInt(configService.get<string>('REDIS_PORT') || '6379', 10);
+        // Ensure ttl is a number
+        const ttl = parseInt(configService.get<string>('CACHE_TTL') || '60', 10);
+
+        return {
+          store: redisStore,
+          host: host,
+          port: port,
+          ttl: ttl, // seconds
+        };
+      },
       inject: [ConfigService],
     }),
     AuthModule,

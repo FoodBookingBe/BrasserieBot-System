@@ -1,92 +1,134 @@
-# BrasserieBot Deployment
+# BrasserieBot Deployment Guide
 
-Dit document bevat instructies voor het deployen van de BrasserieBot applicatie naar cloud diensten.
-
-## Overzicht
-
-De BrasserieBot applicatie bestaat uit verschillende componenten:
-
-1. **Frontend**: Een Next.js applicatie die wordt gehost op Netlify
-2. **Backend**: Een NestJS API die wordt gehost op Render.com
-3. **Database**: Een PostgreSQL database die wordt gehost op Render.com
-4. **AutoDev**: Een Node.js applicatie die wordt gehost op Render.com
-5. **AutoDev Dashboard**: Een Node.js applicatie die wordt gehost op Render.com
+Deze gids bevat instructies voor het deployen van het BrasserieBot systeem naar Netlify via GitHub Actions.
 
 ## Vereisten
 
-Voordat je begint, zorg ervoor dat je het volgende hebt:
+- GitHub account
+- Netlify account
+- Supabase account
+- Node.js (versie 18 of hoger)
 
-- [Git](https://git-scm.com/downloads) geïnstalleerd
-- [Node.js](https://nodejs.org/) (v18 of hoger) geïnstalleerd
-- [GitHub](https://github.com/) account
-- [Netlify](https://www.netlify.com/) account
-- [Render.com](https://render.com/) account
-- [GitHub CLI](https://cli.github.com/) geïnstalleerd
-- [Netlify CLI](https://docs.netlify.com/cli/get-started/) geïnstalleerd (`npm install -g netlify-cli`)
-- [Claude API key](https://www.anthropic.com/) voor de AI functionaliteit
-- [Pinecone](https://www.pinecone.io/) account en API key voor de vector database
+## Stap 1: GitHub Repository Configuratie
 
-## Automatische Deployment
-
-We hebben een automatiseringsscript gemaakt dat je door het deployment proces leidt:
-
-```powershell
-# Open PowerShell als administrator
-cd BrasserieBot
-./deploy.ps1
-```
-
-Het script zal je door de volgende stappen leiden:
-
-1. Controleren of alle vereiste tools zijn geïnstalleerd
-2. Vragen om je GitHub gebruikersnaam, Claude API key en Pinecone API key
-3. De code naar GitHub repositories pushen
-4. De frontend naar Netlify deployen
-5. Je helpen bij het deployen van de backend en AutoDev naar Render.com
-6. De applicatie testen
-
-## Handmatige Deployment
-
-Als je liever handmatig wilt deployen, volg dan de stappen in het `deployment-guide.md` bestand:
-
-```powershell
-# Open het deployment guide bestand
-notepad deployment-guide.md
-```
-
-## Configuratiebestanden
-
-De volgende configuratiebestanden zijn aangemaakt voor deployment:
-
-- `frontend/netlify.toml`: Configuratie voor Netlify deployment
-- `backend/render.yaml`: Blueprint configuratie voor Render.com
-- `autodev/render.yaml`: Blueprint configuratie voor Render.com
-
-## Na de Deployment
-
-Nadat de applicatie is gedeployed, kun je het volgende doen:
-
-1. **Database Migraties**: Voer de database migraties uit via de Render.com shell:
+1. Clone deze repository naar je lokale machine:
    ```bash
-   npx prisma migrate deploy
+   git clone https://github.com/jouw-username/BrasserieBot-System.git
+   cd BrasserieBot-System
    ```
 
-2. **AutoDev Kennisbank**: Initialiseer de AutoDev kennisbank via de Render.com shell:
+2. Installeer de benodigde dependencies:
    ```bash
-   npm run initialize-knowledge-base
+   npm install
    ```
 
-3. **Domein Configuratie**: Configureer een aangepast domein voor je applicatie in Netlify en Render.com
+3. Configureer de GitHub secrets met het configuratiescript:
+   ```bash
+   node scripts/configure-github-secrets.js
+   ```
+   
+   Het script zal je vragen om de volgende gegevens in te voeren:
+   - GitHub gebruikersnaam
+   - GitHub repository naam
+   - GitHub persoonlijke toegangstoken
+   - Supabase URL
+   - Supabase anonieme sleutel
+   - Supabase service role sleutel
+   - Netlify auth token
+   - Netlify site ID
 
-## Problemen Oplossen
+## Stap 2: Supabase Configuratie
 
-Als je problemen ondervindt tijdens het deployment proces, controleer dan het volgende:
+1. Ga naar het [Supabase Dashboard](https://app.supabase.io)
+2. Selecteer je project
+3. Ga naar 'Settings' > 'API'
+4. Kopieer de URL en anonieme sleutel
+5. Ga naar 'Settings' > 'Service Role'
+6. Kopieer de service role sleutel
 
-1. **Netlify Logs**: Controleer de build logs in de Netlify dashboard
-2. **Render.com Logs**: Controleer de logs in de Render.com dashboard
-3. **Environment Variabelen**: Controleer of alle environment variabelen correct zijn ingesteld
-4. **Netwerk Toegang**: Controleer of de services met elkaar kunnen communiceren
+Deze gegevens heb je nodig voor het configureren van de GitHub secrets.
 
-## Ondersteuning
+## Stap 3: Netlify Configuratie
 
-Als je hulp nodig hebt bij het deployment proces, neem dan contact op met het BrasserieBot team.
+1. Ga naar het [Netlify Dashboard](https://app.netlify.com)
+2. Klik op 'New site from Git'
+3. Selecteer GitHub als je Git provider
+4. Selecteer de BrasserieBot-System repository
+5. Stel de build instellingen in:
+   - Build command: `npm run process-html`
+   - Publish directory: `./frontend/public`
+6. Klik op 'Advanced settings' en voeg de volgende environment variabelen toe:
+   - `SUPABASE_DATABASE_URL`: Je Supabase project URL
+   - `SUPABASE_ANON_KEY`: Je Supabase anonieme sleutel
+7. Klik op 'Deploy site'
+8. Ga naar 'Site settings' > 'General' > 'Site details'
+9. Kopieer de site ID (je vindt dit in de API ID sectie)
+10. Ga naar 'User settings' > 'Applications'
+11. Genereer een nieuw personal access token
+
+De site ID en personal access token heb je nodig voor het configureren van de GitHub secrets.
+
+## Stap 4: GitHub Actions Workflow Activeren
+
+De repository bevat al een GitHub Actions workflow bestand: `.github/workflows/deploy.yml`. Deze workflow wordt automatisch uitgevoerd bij elke push naar de main branch.
+
+1. Push je wijzigingen naar de main branch:
+   ```bash
+   git add .
+   git commit -m "Initial setup"
+   git push origin main
+   ```
+
+2. Ga naar de 'Actions' tab in je GitHub repository om de workflow uitvoering te bekijken.
+
+3. De workflow zal de volgende stappen uitvoeren:
+   - Validatie en tests
+   - Database migraties (alleen bij push naar main)
+   - Frontend deployment naar Netlify (alleen bij push naar main)
+
+## Stap 5: Verifiëren van de Deployment
+
+1. Controleer of de deployment succesvol is voltooid in de GitHub Actions tab.
+2. Bezoek je Netlify site URL om te controleren of de applicatie correct werkt.
+3. De URL van je site is te vinden in het Netlify dashboard.
+
+## Probleemoplossing
+
+### Connectie Tester
+
+De frontend bevat een ingebouwde connectietest component (rechtsonder in beeld) waarmee je de connectie met Supabase kunt controleren. Als er problemen zijn met de connectie, worden deze hier weergegeven.
+
+### Lokaal Testen
+
+Je kunt de applicatie lokaal testen voordat je deze deployt:
+
+1. Voer het process-html script uit:
+   ```bash
+   npm run process-html
+   ```
+
+2. Open de frontend in een browser:
+   ```bash
+   open frontend/public/index.html
+   ```
+
+### Foutopsporing
+
+Als de GitHub Actions workflow faalt, controleer dan de volgende punten:
+
+1. Zorg ervoor dat alle GitHub secrets correct zijn geconfigureerd.
+2. Controleer of de Supabase en Netlify URLs en tokens correct zijn en niet verlopen.
+3. Bekijk de GitHub Actions logs voor specifieke foutmeldingen.
+
+## Handleiding bijwerken frontend
+
+Als je wijzigingen aan de frontend wilt aanbrengen:
+
+1. Bewerk de bestanden in de `frontend/public` map.
+2. Test je wijzigingen lokaal.
+3. Commit en push je wijzigingen naar de main branch.
+4. De GitHub Actions workflow zal automatisch worden uitgevoerd en je wijzigingen deployen.
+
+## Contactgegevens
+
+Voor vragen of problemen met de deployment, neem contact op met het BrasserieBot team.

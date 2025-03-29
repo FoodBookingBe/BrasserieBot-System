@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { CoreService } from './core.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -24,11 +34,7 @@ export class CoreController {
   }
 
   @Put('restaurants/:id')
-  async updateRestaurant(
-    @Param('id') id: string,
-    @Body() data: any,
-    @Request() req,
-  ) {
+  async updateRestaurant(@Param('id') id: string, @Body() data: any, @Request() req) {
     return this.coreService.updateRestaurant(+id, data, req.user.id);
   }
 
@@ -44,11 +50,7 @@ export class CoreController {
   }
 
   @Post('restaurants/:id/menus')
-  async createMenu(
-    @Param('id') id: string,
-    @Body() data: any,
-    @Request() req,
-  ) {
+  async createMenu(@Param('id') id: string, @Body() data: any, @Request() req) {
     return this.coreService.createMenu(data, +id, req.user.id);
   }
 
@@ -59,21 +61,13 @@ export class CoreController {
   }
 
   @Post('restaurants/:id/suppliers')
-  async createSupplier(
-    @Param('id') id: string,
-    @Body() data: any,
-    @Request() req,
-  ) {
+  async createSupplier(@Param('id') id: string, @Body() data: any, @Request() req) {
     return this.coreService.createSupplier(data, +id, req.user.id);
   }
 
   // Supplier payment endpoints
   @Post('suppliers/:id/payments')
-  async createSupplierPayment(
-    @Param('id') id: string,
-    @Body() data: any,
-    @Request() req,
-  ) {
+  async createSupplierPayment(@Param('id') id: string, @Body() data: any, @Request() req) {
     return this.coreService.createSupplierPayment(data, +id, req.user.id);
   }
 }

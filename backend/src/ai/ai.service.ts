@@ -1,6 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+// Define interfaces for expected API responses
+interface ClaudeErrorResponse {
+  error?: {
+    message?: string;
+  };
+}
+
+interface ClaudeSuccessResponse {
+  content: Array<{
+    text?: string;
+  }>;
+}
+
 @Injectable()
 export class AiService {
   constructor(private configService: ConfigService) {}
@@ -13,7 +26,7 @@ export class AiService {
   async generateBusinessAdvice(prompt: string): Promise<string> {
     try {
       const apiKey = this.configService.get<string>('CLAUDE_API_KEY');
-      
+
       if (!apiKey) {
         throw new Error('CLAUDE_API_KEY is not defined in environment variables');
       }
@@ -23,7 +36,7 @@ export class AiService {
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01'
+          'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
           model: 'claude-3-opus-20240229',
@@ -31,22 +44,34 @@ export class AiService {
           messages: [
             {
               role: 'user',
-              content: prompt
-            }
-          ]
-        })
+              content: prompt,
+            },
+          ],
+        }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(`Claude API error: ${errorData.error?.message || response.statusText}`);
+        // Type the error response
+        const errorData = (await response.json()) as ClaudeErrorResponse;
+        const errorMessage = errorData?.error?.message || response.statusText;
+        throw new Error(`Claude API error: ${errorMessage}`);
       }
 
-      const data = await response.json();
-      return data.content[0].text;
+      // Type the success response
+      const data = (await response.json()) as ClaudeSuccessResponse;
+
+      // Safely access the content
+      const advice = data?.content?.[0]?.text;
+      if (typeof advice !== 'string') {
+        console.error('Unexpected Claude API response format:', data);
+        throw new Error('Unexpected response format from Claude API');
+      }
+      return advice;
     } catch (error) {
       console.error('Error generating business advice:', error);
-      throw new Error(`Failed to generate business advice: ${error.message}`);
+      // Ensure error has a message property
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to generate business advice: ${message}`);
     }
   }
 }

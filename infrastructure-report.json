@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-03-28T16:00:26.227Z",
+  "timestamp": "2025-03-28T18:10:22.286Z",
   "overall": "issues",
   "components": {
     "supabase": {
@@ -21,21 +21,23 @@
     "github": {
       "status": "error",
       "issues": [
-        "Geen .github/workflows directory gevonden"
+        "GitHub token niet gevonden (GITHUB_TOKEN environment variable)"
       ],
       "fixes": []
     },
     "netlify": {
       "status": "error",
       "issues": [
-        "netlify.toml mist [build.environment] sectie",
-        "Netlify API token niet geconfigureerd"
+        "Netlify API token niet geconfigureerd (NETLIFY_AUTH_TOKEN environment variable)"
       ],
       "fixes": []
     },
     "mcp": {
-      "status": "ok",
-      "issues": [],
+      "status": "error",
+      "issues": [
+        "MCP server ontbreekt: github-server",
+        "MCP server ontbreekt: supabase-server"
+      ],
       "fixes": []
     }
   }
