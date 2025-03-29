@@ -19,7 +19,7 @@ console.log("🚀 BRASSERIEBOT NETLIFY DEPLOYMENT COMPLETE 🚀");
 console.log("=============================================");
 
 // Netlify site ID
-const NETLIFY_SITE_ID = process.env.NETLIFY_SITE_ID || 'foodbookingai';
+const NETLIFY_SITE_ID = process.env.NETLIFY_SITE_ID || 'brasseriebotapp';
 const NETLIFY_AUTH_TOKEN = process.env.NETLIFY_AUTH_TOKEN;
 
 /**
